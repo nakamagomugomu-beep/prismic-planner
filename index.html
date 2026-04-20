@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Prismic Planner</title>
+    <meta name="description" content="Agenda personal y gestor de tareas de Damian - Prismic Planner">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================ */
+        /* DESIGN SYSTEM                                */
+        /* ============================================ */
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a26;
+            --bg-card-hover: #22222f;
+            --bg-glass: rgba(26, 26, 38, 0.7);
+            --border: rgba(255, 255, 255, 0.06);
+            --border-active: rgba(139, 92, 246, 0.4);
+
+            --text-primary: #f0f0f5;
+            --text-secondary: #8888a0;
+            --text-muted: #55556a;
+
+            --accent: #8b5cf6;
+            --accent-glow: rgba(139, 92, 246, 0.15);
+            --accent-2: #06b6d4;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f59e0b;
+
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ============================================ */
+        /* LAYOUT                                       */
+        /* ============================================ */
+        .app {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 16px;
+            padding-bottom: 100px;
+        }
+
+        /* ============================================ */
+        /* HEADER                                       */
+        /* ============================================ */
+        .header {
+            padding: 24px 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(to bottom, var(--bg-primary) 70%, transparent);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        .header-date {
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* ============================================ */
+        /* WEEK NAVIGATION                              */
+        /* ============================================ */
+        .week-nav {
+            display: flex;
+            gap: 4px;
+            padding: 4px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .week-nav::-webkit-scrollbar { display: none; }
+
+        .day-btn {
+            flex: 1;
+            min-width: 48px;
+            padding: 8px 4px;
+            background: none;
+            border: none;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .day-btn .day-num {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .day-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 12px var(--accent-glow);
+        }
+
+        .day-btn.active .day-num {
+            color: white;
+        }
+
+        .day-btn.today {
+            border: 1px solid var(--accent);
+        }
+
+        .day-btn.has-tasks .day-num::after {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            margin: 2px auto 0;
+        }
+
+        .day-btn.active.has-tasks .day-num::after {
+            background: white;
+        }
+
+        /* ============================================ */
+        /* QUICK STATS                                  */
+        /* ============================================ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .stat-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-pill .stat-val {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-pill .stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        /* ============================================ */
+        /* TASK LIST                                    */
+        /* ============================================ */
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin: 20px 0 10px;
+        }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .task-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-active);
+        }
+
+        .task-card.completed {
+            opacity: 0.5;
+        }
+
+        .task-card.completed .task-title {
+            text-decoration: line-through;
+        }
+
+        .task-check {
+            width: 22px;
+            height: 22px;
+            min-width: 22px;
+            border-radius: 6px;
+            border: 2px solid var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .task-check.checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .task-check.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .task-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-title {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        .task-tag {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .tag-work { background: rgba(139, 92, 246, 0.15); color: var(--accent); }
+        .tag-personal { background: rgba(6, 182, 212, 0.15); color: var(--accent-2); }
+        .tag-study { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .tag-urgent { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        .task-time {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .task-delete {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: none;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            font-size: 14px;
+            cursor: pointer;
+            opacity: 0;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-card:hover .task-delete {
+            opacity: 1;
+        }
+
+        /* Mobile: always show delete */
+        @media (hover: none) {
+            .task-delete { opacity: 0.6; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 0;
+            color: var(--text-muted);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* ============================================ */
+        /* NOTES SECTION                                */
+        /* ============================================ */
+        .notes-area {
+            margin-top: 16px;
+        }
+
+        .notes-textarea {
+            width: 100%;
+            min-height: 100px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 13px;
+            line-height: 1.6;
+            padding: 14px 16px;
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        .notes-textarea:focus {
+            outline: none;
+            border-color: var(--border-active);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .notes-textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* ============================================ */
+        /* FAB (Floating Action Button)                 */
+        /* ============================================ */
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 50%;
+            transform: translateX(calc(240px - 28px));
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent), #7c3aed);
+            border: none;
+            color: white;
+            font-size: 28px;
+            font-weight: 300;
+            cursor: pointer;
+            box-shadow: 0 4px 24px rgba(139, 92, 246, 0.4);
+            transition: var(--transition);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fab:hover {
+            transform: translateX(calc(240px - 28px)) scale(1.05);
+        }
+
+        .fab:active {
+            transform: translateX(calc(240px - 28px)) scale(0.95);
+        }
+
+        @media (max-width: 520px) {
+            .fab {
+                right: 20px;
+                transform: none;
+            }
+            .fab:hover { transform: scale(1.05); }
+            .fab:active { transform: scale(0.95); }
+        }
+
+        /* ============================================ */
+        /* MODAL                                        */
+        /* ============================================ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 300;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal {
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-secondary);
+            border-radius: 20px 20px 0 0;
+            padding: 24px;
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-top: 1px solid var(--border);
+        }
+
+        .modal-handle {
+            width: 36px;
+            height: 4px;
+            background: var(--text-muted);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+            opacity: 0.5;
+        }
+
+        .modal h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -0.3px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--border-active);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .tag-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag-option {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tag-option.selected {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+            color: var(--accent);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #7c3aed;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        /* ============================================ */
+        /* LOCK SCREEN                                  */
+        /* ============================================ */
+        .lock-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .lock-screen.hidden {
+            display: none;
+        }
+
+        .lock-logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+        }
+
+        .lock-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .lock-subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .pin-display {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .pin-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .pin-dot.filled {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .pin-dot.error {
+            border-color: var(--danger);
+            background: var(--danger);
+        }
+
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 72px);
+            gap: 12px;
+        }
+
+        .pin-key {
+            width: 72px;
+            height: 56px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 22px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pin-key:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-active);
+        }
+
+        .pin-key:active {
+            transform: scale(0.95);
+        }
+
+        .pin-key.key-back {
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        .pin-error-msg {
+            color: var(--danger);
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 16px;
+            min-height: 18px;
+        }
+
+        .lock-logout {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .lock-logout:hover {
+            color: var(--danger);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+
+        .shake {
+            animation: shake 0.4s ease;
+        }
+
+        /* ============================================ */
+        /* SYNC INDICATOR & SETTINGS                    */
+        /* ============================================ */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sync-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 4px 8px;
+            border-radius: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .sync-indicator.synced {
+            color: var(--success);
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+
+        .sync-indicator.syncing {
+            color: var(--warning);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        .sync-indicator.offline {
+            color: var(--text-muted);
+        }
+
+        .sync-indicator.error {
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .sync-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .sync-indicator.syncing .sync-dot {
+            animation: pulse 1s infinite;
+        }
+
+        .btn-settings {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        .btn-settings:hover {
+            color: var(--text-primary);
+            background: var(--bg-card);
+        }
+
+        .settings-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 400;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .settings-modal.active {
+            display: flex;
+        }
+
+        .settings-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .settings-card h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .settings-info {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOCK SCREEN -->
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-logo">🔒</div>
+        <div class="lock-title" id="lockTitle">Ingresá tu PIN</div>
+        <div class="lock-subtitle" id="lockSubtitle">4 dígitos para acceder</div>
+        <div class="pin-display" id="pinDisplay">
+            <div class="pin-dot" data-pos="0"></div>
+            <div class="pin-dot" data-pos="1"></div>
+            <div class="pin-dot" data-pos="2"></div>
+            <div class="pin-dot" data-pos="3"></div>
+        </div>
+        <div class="pin-keypad" id="pinKeypad">
+            <button class="pin-key" data-num="1">1</button>
+            <button class="pin-key" data-num="2">2</button>
+            <button class="pin-key" data-num="3">3</button>
+            <button class="pin-key" data-num="4">4</button>
+            <button class="pin-key" data-num="5">5</button>
+            <button class="pin-key" data-num="6">6</button>
+            <button class="pin-key" data-num="7">7</button>
+            <button class="pin-key" data-num="8">8</button>
+            <button class="pin-key" data-num="9">9</button>
+            <button class="pin-key" data-num=""></button>
+            <button class="pin-key" data-num="0">0</button>
+            <button class="pin-key key-back" data-num="back">⌫</button>
+        </div>
+        <div class="pin-error-msg" id="pinError"></div>
+    </div>
+
+    <div class="app" id="app" style="display:none;">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-top">
+                <div class="logo">
+                    <div class="logo-icon">⚡</div>
+                    <div class="logo-text"><span>Prismic</span> Planner</div>
+                </div>
+                <div class="header-actions">
+                    <div class="sync-indicator offline" id="syncIndicator">
+                        <span class="sync-dot"></span>
+                        <span id="syncText">Local</span>
+                    </div>
+                    <button class="btn-settings" id="btnSettings" title="Configuración">⚙️</button>
+                    <button class="lock-logout" id="btnLogout" title="Bloquear">🔒</button>
+                </div>
+                <div class="header-date" id="currentDate"></div>
+            </div>
+            <div class="week-nav" id="weekNav"></div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-row" id="statsRow">
+            <div class="stat-pill">
+                <div class="stat-val" id="statTotal">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-pill">
+                <div class="stat-val" id="statPending">0</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-pill">
+                <div class="stat-val" id="statDone">0</div>
+                <div class="stat-label">Hechas</div>
+            </div>
+        </div>
+
+        <!-- TASKS -->
+        <div class="section-label">Tareas del día</div>
+        <div class="task-list" id="taskList"></div>
+
+        <!-- NOTES -->
+        <div class="notes-area">
+            <div class="section-label">Notas del día</div>
+            <textarea class="notes-textarea" id="dayNotes" placeholder="Escribí lo que necesites recordar..."></textarea>
+        </div>
+    </div>
+
+    <!-- FAB -->
+    <button class="fab" id="fabAdd" title="Agregar tarea" style="display:none;">+</button>
+
+    <!-- SETTINGS MODAL -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-card">
+            <h3>⚙️ Configuración de Sync</h3>
+            <div class="settings-info">
+                Para sincronizar entre PC y celular, necesitás crear un Google Sheet con un Apps Script.
+                Seguí las instrucciones del archivo <strong>google_apps_script.js</strong> y pegá la URL acá.
+            </div>
+            <div class="input-group">
+                <label>URL del Apps Script</label>
+                <input type="url" id="syncUrlInput" placeholder="https://script.google.com/macros/s/...">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="btnSettingsCancel">Cancelar</button>
+                <button class="btn btn-primary" id="btnSettingsSave">Guardar y Sincronizar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-handle"></div>
+            <h2>Nueva tarea</h2>
+            <div class="input-group">
+                <label>Descripción</label>
+                <input type="text" id="taskInput" placeholder="¿Qué tenés que hacer?" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label>Hora (opcional)</label>
+                <input type="time" id="taskTime">
+            </div>
+            <div class="input-group">
+                <label>Categoría</label>
+                <div class="tag-selector" id="tagSelector">
+                    <button class="tag-option selected" data-tag="work">💼 Trabajo</button>
+                    <button class="tag-option" data-tag="personal">🏠 Personal</button>
+                    <button class="tag-option" data-tag="study">📚 Estudio</button>
+                    <button class="tag-option" data-tag="urgent">🔥 Urgente</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="btnCancel">Cancelar</button>
+                <button class="btn btn-primary" id="btnSave">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        const STORAGE_KEY = 'prismic_planner_data';
+        const SYNC_URL_KEY = 'prismic_sync_url';
+
+        let state = {
+            selectedDate: getTodayStr(),
+            tasks: {},
+            notes: {}
+        };
+
+        let syncDebounceTimer;
+
+        function getTodayStr() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function loadState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state.tasks = parsed.tasks || {};
+                    state.notes = parsed.notes || {};
+                }
+            } catch (e) {
+                console.warn('Error cargando estado:', e);
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                tasks: state.tasks,
+                notes: state.notes
+            }));
+            // Sync to cloud (debounced: waits 2 sec after last change)
+            clearTimeout(syncDebounceTimer);
+            syncDebounceTimer = setTimeout(() => pushToCloud(), 2000);
+        }
+
+        // ============================================
+        // CLOUD SYNC (Google Sheets)
+        // ============================================
+        function getSyncUrl() {
+            return localStorage.getItem(SYNC_URL_KEY) || '';
+        }
+
+        function setSyncUrl(url) {
+            localStorage.setItem(SYNC_URL_KEY, url);
+        }
+
+        function updateSyncUI(status, text) {
+            const indicator = document.getElementById('syncIndicator');
+            const textEl = document.getElementById('syncText');
+            indicator.className = 'sync-indicator ' + status;
+            textEl.textContent = text;
+        }
+
+        async function pushToCloud() {
+            const url = getSyncUrl();
+            if (!url) return;
+
+            updateSyncUI('syncing', 'Subiendo...');
+
+            try {
+                const payload = JSON.stringify({
+                    tasks: state.tasks,
+                    notes: state.notes
+                });
+
+                await fetch(url, {
+                    method: 'POST',
+                    body: payload,
+                    headers: { 'Content-Type': 'text/plain' }
+                });
+
+                updateSyncUI('synced', 'Sync ✓');
+                setTimeout(() => {
+                    if (document.getElementById('syncIndicator').classList.contains('synced')) {
+                        updateSyncUI('synced', 'Sync ✓');
+                    }
+                }, 3000);
+            } catch (e) {
+                console.warn('Error subiendo a la nube:', e);
+                updateSyncUI('error', 'Error');
+            }
+        }
+
+        async function pullFromCloud() {
+            const url = getSyncUrl();
+            if (!url) {
+                updateSyncUI('offline', 'Local');
+                return;
+            }
+
+            updateSyncUI('syncing', 'Bajando...');
+
+            try {
+                const response = await fetch(url);
+
+                // Apps Script redirects — fetch follows them, but we check for OK
+                if (!response.ok) throw new Error('Response not OK');
+
+                const text = await response.text();
+                let cloudData;
+                try {
+                    cloudData = JSON.parse(text);
+                } catch (e) {
+                    // Sometimes Apps Script returns double-encoded JSON
+                    cloudData = JSON.parse(JSON.parse(text));
+                }
+
+                if (cloudData && !cloudData.error) {
+                    // Merge: cloud data wins for any existing dates, local keeps new ones
+                    const mergedTasks = { ...state.tasks };
+                    const mergedNotes = { ...state.notes };
+
+                    if (cloudData.tasks) {
+                        for (const [date, tasks] of Object.entries(cloudData.tasks)) {
+                            mergedTasks[date] = tasks;
+                        }
+                    }
+                    if (cloudData.notes) {
+                        for (const [date, note] of Object.entries(cloudData.notes)) {
+                            mergedNotes[date] = note;
+                        }
+                    }
+
+                    state.tasks = mergedTasks;
+                    state.notes = mergedNotes;
+
+                    // Save merged state locally
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                        tasks: state.tasks,
+                        notes: state.notes
+                    }));
+
+                    updateSyncUI('synced', 'Sync ✓');
+                } else {
+                    updateSyncUI('synced', 'Sync ✓');
+                }
+            } catch (e) {
+                console.warn('Error bajando de la nube:', e);
+                updateSyncUI('error', 'Sin conexión');
+            }
+        }
+
+        // ============================================
+        // DATE UTILITIES
+        // ============================================
+        const DAYS_SHORT = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
+        const MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+        function getWeekDates(refDate) {
+            const d = new Date(refDate + 'T12:00:00');
+            const dayOfWeek = d.getDay();
+            const monday = new Date(d);
+            monday.setDate(d.getDate() - ((dayOfWeek + 6) % 7));
+
+            const dates = [];
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(monday);
+                day.setDate(monday.getDate() + i);
+                dates.push(day.toISOString().split('T')[0]);
+            }
+            return dates;
+        }
+
+        function formatDateHeader(dateStr) {
+            const d = new Date(dateStr + 'T12:00:00');
+            return `${d.getDate()} de ${MONTHS[d.getMonth()]}, ${d.getFullYear()}`;
+        }
+
+        // ============================================
+        // RENDER
+        // ============================================
+        function render() {
+            renderHeader();
+            renderWeekNav();
+            renderStats();
+            renderTasks();
+            renderNotes();
+        }
+
+        function renderHeader() {
+            document.getElementById('currentDate').textContent = formatDateHeader(state.selectedDate);
+        }
+
+        function renderWeekNav() {
+            const weekNav = document.getElementById('weekNav');
+            const week = getWeekDates(state.selectedDate);
+            const todayStr = getTodayStr();
+
+            weekNav.innerHTML = week.map(dateStr => {
+                const d = new Date(dateStr + 'T12:00:00');
+                const isActive = dateStr === state.selectedDate;
+                const isToday = dateStr === todayStr;
+                const hasTasks = (state.tasks[dateStr] || []).length > 0;
+
+                let classes = 'day-btn';
+                if (isActive) classes += ' active';
+                if (isToday && !isActive) classes += ' today';
+                if (hasTasks) classes += ' has-tasks';
+
+                return `<button class="${classes}" data-date="${dateStr}">
+                    <span>${DAYS_SHORT[d.getDay()]}</span>
+                    <span class="day-num">${d.getDate()}</span>
+                </button>`;
+            }).join('');
+
+            weekNav.querySelectorAll('.day-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    state.selectedDate = btn.dataset.date;
+                    render();
+                });
+            });
+        }
+
+        function renderStats() {
+            const tasks = state.tasks[state.selectedDate] || [];
+            const total = tasks.length;
+            const done = tasks.filter(t => t.completed).length;
+            const pending = total - done;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statPending').textContent = pending;
+            document.getElementById('statDone').textContent = done;
+        }
+
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            const tasks = state.tasks[state.selectedDate] || [];
+
+            if (tasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <p>No hay tareas para este día</p>
+                    </div>`;
+                return;
+            }
+
+            // Sort: pending first, then completed
+            const sorted = [...tasks].sort((a, b) => a.completed - b.completed);
+
+            taskList.innerHTML = sorted.map((task, i) => {
+                const origIndex = tasks.indexOf(task);
+                const tagClass = `tag-${task.tag || 'work'}`;
+                const tagLabels = { work: '💼 Trabajo', personal: '🏠 Personal', study: '📚 Estudio', urgent: '🔥 Urgente' };
+
+                return `<div class="task-card ${task.completed ? 'completed' : ''}" data-index="${origIndex}">
+                    <div class="task-check ${task.completed ? 'checked' : ''}" data-toggle="${origIndex}"></div>
+                    <div class="task-content">
+                        <div class="task-title">${escapeHtml(task.title)}</div>
+                        <div class="task-meta">
+                            <span class="task-tag ${tagClass}">${tagLabels[task.tag] || '💼 Trabajo'}</span>
+                            ${task.time ? `<span class="task-time">🕐 ${task.time}</span>` : ''}
+                        </div>
+                    </div>
+                    <button class="task-delete" data-delete="${origIndex}" title="Eliminar">✕</button>
+                </div>`;
+            }).join('');
+
+            // Event listeners
+            taskList.querySelectorAll('[data-toggle]').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(el.dataset.toggle);
+                    state.tasks[state.selectedDate][idx].completed = !state.tasks[state.selectedDate][idx].completed;
+                    saveState();
+                    render();
+                });
+            });
+
+            taskList.querySelectorAll('[data-delete]').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const idx = parseInt(el.dataset.delete);
+                    state.tasks[state.selectedDate].splice(idx, 1);
+                    if (state.tasks[state.selectedDate].length === 0) {
+                        delete state.tasks[state.selectedDate];
+                    }
+                    saveState();
+                    render();
+                });
+            });
+        }
+
+        function renderNotes() {
+            const textarea = document.getElementById('dayNotes');
+            textarea.value = state.notes[state.selectedDate] || '';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // MODAL LOGIC
+        // ============================================
+        const modalOverlay = document.getElementById('modalOverlay');
+        const fabAdd = document.getElementById('fabAdd');
+        const btnCancel = document.getElementById('btnCancel');
+        const btnSave = document.getElementById('btnSave');
+        const taskInput = document.getElementById('taskInput');
+        const taskTime = document.getElementById('taskTime');
+        let selectedTag = 'work';
+
+        fabAdd.addEventListener('click', () => {
+            modalOverlay.classList.add('active');
+            taskInput.value = '';
+            taskTime.value = '';
+            selectedTag = 'work';
+            updateTagSelection();
+            setTimeout(() => taskInput.focus(), 300);
+        });
+
+        btnCancel.addEventListener('click', closeModal);
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+        }
+
+        // Tag selection
+        document.getElementById('tagSelector').addEventListener('click', (e) => {
+            const btn = e.target.closest('.tag-option');
+            if (!btn) return;
+            selectedTag = btn.dataset.tag;
+            updateTagSelection();
+        });
+
+        function updateTagSelection() {
+            document.querySelectorAll('.tag-option').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.tag === selectedTag);
+            });
+        }
+
+        // Save task
+        btnSave.addEventListener('click', addTask);
+        taskInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addTask();
+        });
+
+        function addTask() {
+            const title = taskInput.value.trim();
+            if (!title) return;
+
+            if (!state.tasks[state.selectedDate]) {
+                state.tasks[state.selectedDate] = [];
+            }
+
+            state.tasks[state.selectedDate].push({
+                title,
+                tag: selectedTag,
+                time: taskTime.value || '',
+                completed: false,
+                createdAt: Date.now()
+            });
+
+            saveState();
+            closeModal();
+            render();
+        }
+
+        // ============================================
+        // NOTES AUTO-SAVE
+        // ============================================
+        let notesTimeout;
+        document.getElementById('dayNotes').addEventListener('input', (e) => {
+            clearTimeout(notesTimeout);
+            notesTimeout = setTimeout(() => {
+                if (e.target.value.trim()) {
+                    state.notes[state.selectedDate] = e.target.value;
+                } else {
+                    delete state.notes[state.selectedDate];
+                }
+                saveState();
+            }, 500);
+        });
+
+        // ============================================
+        // SETTINGS MODAL
+        // ============================================
+        const settingsModal = document.getElementById('settingsModal');
+        const syncUrlInput = document.getElementById('syncUrlInput');
+
+        document.getElementById('btnSettings').addEventListener('click', () => {
+            syncUrlInput.value = getSyncUrl();
+            settingsModal.classList.add('active');
+        });
+
+        document.getElementById('btnSettingsCancel').addEventListener('click', () => {
+            settingsModal.classList.remove('active');
+        });
+
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) settingsModal.classList.remove('active');
+        });
+
+        document.getElementById('btnSettingsSave').addEventListener('click', async () => {
+            const url = syncUrlInput.value.trim();
+            setSyncUrl(url);
+            settingsModal.classList.remove('active');
+            if (url) {
+                await pullFromCloud();
+                render();
+                await pushToCloud();
+            } else {
+                updateSyncUI('offline', 'Local');
+            }
+        });
+
+        // ============================================
+        // PIN AUTHENTICATION SYSTEM
+        // ============================================
+        const PIN_HASH_KEY = 'prismic_pin_hash';
+        const lockScreen = document.getElementById('lockScreen');
+        const pinDisplay = document.getElementById('pinDisplay');
+        const pinError = document.getElementById('pinError');
+        const lockTitle = document.getElementById('lockTitle');
+        const lockSubtitle = document.getElementById('lockSubtitle');
+        let currentPin = '';
+        let isCreatingPin = false;
+        let newPinFirst = '';
+        let pinAttempts = 0;
+        const MAX_ATTEMPTS = 5;
+
+        // Hash PIN con SHA-256 (seguridad nativa del navegador)
+        async function hashPin(pin) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode('prismic_salt_' + pin);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function hasPinSet() {
+            return localStorage.getItem(PIN_HASH_KEY) !== null;
+        }
+
+        function initAuth() {
+            if (!hasPinSet()) {
+                // Primera vez: crear PIN
+                isCreatingPin = true;
+                lockTitle.textContent = 'Creá tu PIN';
+                lockSubtitle.textContent = 'Elegí 4 dígitos para proteger tu planner';
+            } else {
+                isCreatingPin = false;
+                lockTitle.textContent = 'Ingresá tu PIN';
+                lockSubtitle.textContent = '4 dígitos para acceder';
+            }
+            currentPin = '';
+            updatePinDots();
+        }
+
+        function updatePinDots() {
+            const dots = pinDisplay.querySelectorAll('.pin-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('filled', i < currentPin.length);
+                dot.classList.remove('error');
+            });
+        }
+
+        function showPinError(msg) {
+            pinError.textContent = msg;
+            const dots = pinDisplay.querySelectorAll('.pin-dot');
+            dots.forEach(d => { d.classList.add('error'); d.classList.remove('filled'); });
+            pinDisplay.classList.add('shake');
+            setTimeout(() => {
+                pinDisplay.classList.remove('shake');
+                currentPin = '';
+                updatePinDots();
+            }, 500);
+        }
+
+        async function handlePinComplete() {
+            if (isCreatingPin) {
+                if (newPinFirst === '') {
+                    // Primer ingreso del nuevo PIN
+                    newPinFirst = currentPin;
+                    currentPin = '';
+                    lockTitle.textContent = 'Confirmá tu PIN';
+                    lockSubtitle.textContent = 'Ingresalo de nuevo para confirmar';
+                    updatePinDots();
+                } else {
+                    // Confirmación
+                    if (currentPin === newPinFirst) {
+                        const hash = await hashPin(currentPin);
+                        localStorage.setItem(PIN_HASH_KEY, hash);
+                        unlockApp();
+                    } else {
+                        newPinFirst = '';
+                        lockTitle.textContent = 'Creá tu PIN';
+                        lockSubtitle.textContent = 'Elegí 4 dígitos para proteger tu planner';
+                        showPinError('Los PINs no coinciden. Intentá de nuevo.');
+                    }
+                }
+            } else {
+                // Verificar PIN existente
+                const hash = await hashPin(currentPin);
+                const storedHash = localStorage.getItem(PIN_HASH_KEY);
+                if (hash === storedHash) {
+                    pinAttempts = 0;
+                    unlockApp();
+                } else {
+                    pinAttempts++;
+                    const remaining = MAX_ATTEMPTS - pinAttempts;
+                    if (remaining <= 0) {
+                        showPinError('Demasiados intentos. Recargá la página.');
+                        document.getElementById('pinKeypad').style.pointerEvents = 'none';
+                    } else {
+                        showPinError(`PIN incorrecto. ${remaining} intento${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''}.`);
+                    }
+                }
+            }
+        }
+
+        async function unlockApp() {
+            lockScreen.classList.add('hidden');
+            document.getElementById('app').style.display = '';
+            document.getElementById('fabAdd').style.display = '';
+            loadState();
+            render();
+            // Sync from cloud in background (after showing local data instantly)
+            await pullFromCloud();
+            render(); // Re-render with merged cloud data
+        }
+
+        function lockApp() {
+            lockScreen.classList.remove('hidden');
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('fabAdd').style.display = 'none';
+            currentPin = '';
+            newPinFirst = '';
+            pinError.textContent = '';
+            initAuth();
+        }
+
+        // Keypad events
+        document.getElementById('pinKeypad').addEventListener('click', (e) => {
+            const key = e.target.closest('.pin-key');
+            if (!key) return;
+            const num = key.dataset.num;
+
+            if (num === 'back') {
+                currentPin = currentPin.slice(0, -1);
+                pinError.textContent = '';
+                updatePinDots();
+                return;
+            }
+
+            if (num === '' || currentPin.length >= 4) return;
+
+            currentPin += num;
+            updatePinDots();
+
+            if (currentPin.length === 4) {
+                setTimeout(() => handlePinComplete(), 200);
+            }
+        });
+
+        // Keyboard support (PC)
+        document.addEventListener('keydown', (e) => {
+            if (lockScreen.classList.contains('hidden')) return;
+            if (e.key >= '0' && e.key <= '9' && currentPin.length < 4) {
+                currentPin += e.key;
+                updatePinDots();
+                if (currentPin.length === 4) setTimeout(() => handlePinComplete(), 200);
+            } else if (e.key === 'Backspace') {
+                currentPin = currentPin.slice(0, -1);
+                updatePinDots();
+            }
+        });
+
+        // Logout button
+        document.getElementById('btnLogout').addEventListener('click', lockApp);
+
+        // ============================================
+        // INIT
+        // ============================================
+        initAuth();
+    </script>
+</body>
+</html>
