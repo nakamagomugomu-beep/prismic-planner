@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Prismic Planner</title>
-    <meta name="description" content="Agenda personal y gestor de tareas - Prismic Planner">
+    <meta name="description" content="Agenda personal, pomodoro y gym tracker - Prismic Planner">
     <meta name="theme-color" content="#0a0a0f">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,814 +13,484 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
-            --bg-card: #1a1a26;
-            --bg-card-hover: #22222f;
-            --bg-glass: rgba(26, 26, 38, 0.85);
-            --border: rgba(255,255,255,0.06);
-            --border-active: rgba(139,92,246,0.4);
-            --text-primary: #f0f0f5;
-            --text-secondary: #8888a0;
-            --text-muted: #55556a;
-            --accent: #8b5cf6;
-            --accent-glow: rgba(139,92,246,0.15);
-            --accent-2: #06b6d4;
-            --danger: #ef4444;
-            --success: #22c55e;
-            --warning: #f59e0b;
-            --radius: 12px;
-            --radius-sm: 8px;
-            --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
-            --shadow: 0 4px 24px rgba(0,0,0,0.3);
-        }
-        [data-theme="light"] {
-            --bg-primary: #f5f5f7;
-            --bg-secondary: #eaeaef;
-            --bg-card: #ffffff;
-            --bg-card-hover: #f0f0f5;
-            --bg-glass: rgba(245,245,247,0.85);
-            --border: rgba(0,0,0,0.08);
-            --border-active: rgba(139,92,246,0.4);
-            --text-primary: #1a1a2e;
-            --text-secondary: #6b6b80;
-            --text-muted: #9999aa;
-            --shadow: 0 4px 24px rgba(0,0,0,0.08);
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
-            background:var(--bg-primary); color:var(--text-primary);
-            min-height:100vh; min-height:100dvh;
-            overflow-x:hidden; -webkit-font-smoothing:antialiased;
-            transition: background 0.3s, color 0.3s;
-        }
-        /* === LOCK SCREEN === */
-        .lock-screen { position:fixed; inset:0; background:var(--bg-primary); z-index:999; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
-        .lock-screen.hidden { display:none; }
-        .lock-logo { width:64px; height:64px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:32px; margin-bottom:24px; box-shadow:0 8px 32px rgba(139,92,246,0.3); }
-        .lock-title { font-size:22px; font-weight:700; margin-bottom:8px; }
-        .lock-subtitle { color:var(--text-muted); font-size:13px; margin-bottom:32px; text-align:center; }
-        .pin-display { display:flex; gap:12px; margin-bottom:32px; }
-        .pin-dot { width:16px; height:16px; border-radius:50%; border:2px solid var(--text-muted); transition:var(--transition); }
-        .pin-dot.filled { background:var(--accent); border-color:var(--accent); box-shadow:0 0 8px var(--accent-glow); }
-        .pin-dot.error { border-color:var(--danger); background:var(--danger); }
-        .pin-keypad { display:grid; grid-template-columns:repeat(3,72px); gap:12px; }
-        .pin-key { width:72px; height:56px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg-card); color:var(--text-primary); font-family:inherit; font-size:22px; font-weight:600; cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; }
-        .pin-key:hover { background:var(--bg-card-hover); border-color:var(--border-active); }
-        .pin-key:active { transform:scale(0.95); }
-        .pin-key.key-back { font-size:16px; color:var(--text-muted); }
-        .pin-error-msg { color:var(--danger); font-size:12px; font-weight:600; margin-top:16px; min-height:18px; }
-        .lock-links { margin-top:20px; display:flex; gap:16px; }
-        .lock-link { background:none; border:none; color:var(--text-muted); font-family:inherit; font-size:12px; cursor:pointer; text-decoration:underline; }
-        .lock-link:hover { color:var(--accent); }
-        .recovery-form { width:100%; max-width:320px; display:none; }
-        .recovery-form.active { display:block; }
-        .recovery-input { width:100%; padding:12px 14px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-primary); font-family:inherit; font-size:14px; margin-bottom:12px; }
-        .recovery-input:focus { outline:none; border-color:var(--border-active); }
-        @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
-        .shake { animation:shake 0.4s ease; }
+        :root{--bg-primary:#0a0a0f;--bg-secondary:#12121a;--bg-card:#1a1a26;--bg-card-hover:#22222f;--bg-glass:rgba(26,26,38,0.85);--border:rgba(255,255,255,0.06);--border-active:rgba(139,92,246,0.4);--text-primary:#f0f0f5;--text-secondary:#8888a0;--text-muted:#55556a;--accent:#8b5cf6;--accent-glow:rgba(139,92,246,0.15);--accent-2:#06b6d4;--danger:#ef4444;--success:#22c55e;--warning:#f59e0b;--radius:12px;--radius-sm:8px;--transition:0.2s cubic-bezier(0.4,0,0.2,1);--shadow:0 4px 24px rgba(0,0,0,0.3)}
+        [data-theme="light"]{--bg-primary:#f5f5f7;--bg-secondary:#eaeaef;--bg-card:#ffffff;--bg-card-hover:#f0f0f5;--bg-glass:rgba(245,245,247,0.85);--border:rgba(0,0,0,0.08);--text-primary:#1a1a2e;--text-secondary:#6b6b80;--text-muted:#9999aa;--shadow:0 4px 24px rgba(0,0,0,0.08)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
 
-        /* === APP SHELL === */
-        .app-shell { display:none; }
-        .app-shell.active { display:block; }
-        .topbar { position:sticky; top:0; z-index:100; background:var(--bg-glass); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--border); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; }
-        .topbar-left { display:flex; align-items:center; gap:10px; }
-        .hamburger { background:none; border:none; color:var(--text-primary); font-size:20px; cursor:pointer; padding:4px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:var(--radius-sm); transition:var(--transition); }
-        .hamburger:hover { background:var(--bg-card); }
-        .topbar-title { font-size:16px; font-weight:700; letter-spacing:-0.3px; }
-        .topbar-title span { color:var(--accent); }
-        .topbar-right { display:flex; align-items:center; gap:8px; }
-        .sync-badge { display:flex; align-items:center; gap:4px; font-size:10px; font-weight:600; color:var(--text-muted); padding:4px 8px; border-radius:20px; background:var(--bg-card); border:1px solid var(--border); }
-        .sync-badge.synced { color:var(--success); border-color:rgba(34,197,94,0.2); }
-        .sync-badge.syncing { color:var(--warning); }
-        .sync-badge.error { color:var(--danger); }
-        .sync-dot { width:6px; height:6px; border-radius:50%; background:currentColor; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-        .sync-badge.syncing .sync-dot { animation:pulse 1s infinite; }
-        .topbar-btn { background:none; border:none; color:var(--text-muted); font-size:16px; cursor:pointer; padding:6px; border-radius:var(--radius-sm); transition:var(--transition); }
-        .topbar-btn:hover { color:var(--text-primary); background:var(--bg-card); }
+        /* LOCK */
+        .lock-screen{position:fixed;inset:0;background:var(--bg-primary);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+        .lock-screen.hidden{display:none}
+        .lock-logo{width:72px;height:72px;margin-bottom:24px}
+        .lock-title{font-size:22px;font-weight:700;margin-bottom:8px}
+        .lock-subtitle{color:var(--text-muted);font-size:13px;margin-bottom:32px;text-align:center}
+        .pin-display{display:flex;gap:12px;margin-bottom:32px}
+        .pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--text-muted);transition:var(--transition)}
+        .pin-dot.filled{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
+        .pin-dot.error{border-color:var(--danger);background:var(--danger)}
+        .pin-keypad{display:grid;grid-template-columns:repeat(3,72px);gap:12px}
+        .pin-key{width:72px;height:56px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:22px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center}
+        .pin-key:active{transform:scale(0.95)}
+        .pin-key.key-back{font-size:16px;color:var(--text-muted)}
+        .pin-error-msg{color:var(--danger);font-size:12px;font-weight:600;margin-top:16px;min-height:18px}
+        .lock-links{margin-top:20px}
+        .lock-link{background:none;border:none;color:var(--text-muted);font-family:inherit;font-size:12px;cursor:pointer;text-decoration:underline}
+        .lock-link:hover{color:var(--accent)}
+        .recovery-form{width:100%;max-width:320px;display:none}
+        .recovery-form.active{display:block}
+        .recovery-input{width:100%;padding:12px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:inherit;font-size:14px;margin-bottom:12px}
+        .recovery-input:focus{outline:none;border-color:var(--border-active)}
+        @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+        .shake{animation:shake .4s ease}
 
-        /* === SIDEBAR === */
-        .sidebar-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; display:none; }
-        .sidebar-overlay.active { display:block; }
-        .sidebar { position:fixed; top:0; left:-280px; width:280px; height:100%; background:var(--bg-secondary); border-right:1px solid var(--border); z-index:501; transition:left 0.3s cubic-bezier(0.4,0,0.2,1); padding:24px 0; display:flex; flex-direction:column; }
-        .sidebar.open { left:0; }
-        .sidebar-header { padding:0 20px 24px; border-bottom:1px solid var(--border); }
-        .sidebar-brand { display:flex; align-items:center; gap:10px; margin-bottom:4px; }
-        .sidebar-brand-icon { width:32px; height:32px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
-        .sidebar-brand-text { font-size:16px; font-weight:700; }
-        .sidebar-brand-text span { color:var(--accent); }
-        .sidebar-nav { flex:1; padding:16px 0; }
-        .nav-item { display:flex; align-items:center; gap:12px; padding:12px 20px; color:var(--text-secondary); font-size:14px; font-weight:500; cursor:pointer; transition:var(--transition); border-left:3px solid transparent; }
-        .nav-item:hover { background:var(--bg-card); color:var(--text-primary); }
-        .nav-item.active { color:var(--accent); border-left-color:var(--accent); background:var(--accent-glow); }
-        .nav-item .nav-icon { font-size:18px; width:24px; text-align:center; }
-        .sidebar-footer { padding:16px 20px; border-top:1px solid var(--border); font-size:11px; color:var(--text-muted); }
+        /* SHELL */
+        .app-shell{display:none}.app-shell.active{display:block}
+        .topbar{position:sticky;top:0;z-index:100;background:var(--bg-glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+        .topbar-left{display:flex;align-items:center;gap:10px}
+        .hamburger{background:none;border:none;color:var(--text-primary);font-size:20px;cursor:pointer;padding:4px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);transition:var(--transition)}
+        .hamburger:hover{background:var(--bg-card)}
+        .topbar-logo{width:28px;height:28px}
+        .topbar-title{font-size:16px;font-weight:700;letter-spacing:-.3px}
+        .topbar-title span{color:var(--accent)}
+        .topbar-right{display:flex;align-items:center;gap:8px}
+        .sync-badge{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--text-muted);padding:4px 8px;border-radius:20px;background:var(--bg-card);border:1px solid var(--border)}
+        .sync-badge.synced{color:var(--success);border-color:rgba(34,197,94,.2)}
+        .sync-badge.syncing{color:var(--warning)}
+        .sync-badge.error{color:var(--danger)}
+        .sync-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+        .sync-badge.syncing .sync-dot{animation:pulse 1s infinite}
+        .topbar-btn{background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;padding:6px;border-radius:var(--radius-sm);transition:var(--transition)}
+        .topbar-btn:hover{color:var(--text-primary);background:var(--bg-card)}
 
-        /* === PAGES === */
-        .page { display:none; max-width:480px; margin:0 auto; padding:16px 16px 100px; }
-        .page.active { display:block; }
+        /* SIDEBAR */
+        .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none}
+        .sidebar-overlay.active{display:block}
+        .sidebar{position:fixed;top:0;left:-280px;width:280px;height:100%;background:var(--bg-secondary);border-right:1px solid var(--border);z-index:501;transition:left .3s cubic-bezier(.4,0,.2,1);padding:24px 0;display:flex;flex-direction:column}
+        .sidebar.open{left:0}
+        .sidebar-header{padding:0 20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+        .sidebar-header svg{width:32px;height:32px}
+        .sidebar-brand-text{font-size:16px;font-weight:700}.sidebar-brand-text span{color:var(--accent)}
+        .sidebar-nav{flex:1;padding:16px 0}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:12px 20px;color:var(--text-secondary);font-size:14px;font-weight:500;cursor:pointer;transition:var(--transition);border-left:3px solid transparent}
+        .nav-item:hover{background:var(--bg-card);color:var(--text-primary)}
+        .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-glow)}
+        .nav-icon{font-size:18px;width:24px;text-align:center}
+        .sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted)}
 
-        /* === PLANNER === */
-        .week-nav { display:flex; gap:4px; padding:4px; background:var(--bg-secondary); border-radius:var(--radius); border:1px solid var(--border); overflow-x:auto; scrollbar-width:none; margin-bottom:16px; }
-        .week-nav::-webkit-scrollbar { display:none; }
-        .day-btn { flex:1; min-width:48px; padding:8px 4px; background:none; border:none; border-radius:var(--radius-sm); color:var(--text-muted); font-family:inherit; font-size:11px; font-weight:600; text-transform:uppercase; cursor:pointer; transition:var(--transition); display:flex; flex-direction:column; align-items:center; gap:4px; }
-        .day-btn .day-num { font-size:16px; font-weight:700; color:var(--text-secondary); }
-        .day-btn.active { background:var(--accent); color:white; box-shadow:0 2px 12px var(--accent-glow); }
-        .day-btn.active .day-num { color:white; }
-        .day-btn.today:not(.active) { border:1px solid var(--accent); }
-        .day-btn.has-tasks .day-num::after { content:''; display:block; width:4px; height:4px; background:var(--accent); border-radius:50%; margin:2px auto 0; }
-        .day-btn.active.has-tasks .day-num::after { background:white; }
-        .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
-        .stat-pill { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px; text-align:center; }
-        .stat-pill .stat-val { font-size:20px; font-weight:800; letter-spacing:-1px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .stat-pill .stat-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; font-weight:600; letter-spacing:0.5px; margin-top:2px; }
-        .section-label { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px; margin:20px 0 10px; }
-        .task-list { display:flex; flex-direction:column; gap:8px; }
-        .task-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:flex-start; gap:12px; cursor:pointer; transition:var(--transition); position:relative; overflow:hidden; }
-        .task-card:hover { background:var(--bg-card-hover); border-color:var(--border-active); }
-        .task-card.completed { opacity:0.5; }
-        .task-card.completed .task-title { text-decoration:line-through; }
-        .task-check { width:22px; height:22px; min-width:22px; border-radius:6px; border:2px solid var(--text-muted); display:flex; align-items:center; justify-content:center; margin-top:1px; transition:var(--transition); cursor:pointer; }
-        .task-check.checked { background:var(--success); border-color:var(--success); }
-        .task-check.checked::after { content:'✓'; color:white; font-size:12px; font-weight:800; }
-        .task-content { flex:1; min-width:0; }
-        .task-title { font-size:14px; font-weight:500; line-height:1.4; word-break:break-word; }
-        .task-meta { display:flex; gap:8px; margin-top:6px; flex-wrap:wrap; }
-        .task-tag { font-size:10px; font-weight:600; padding:2px 8px; border-radius:4px; text-transform:uppercase; letter-spacing:0.3px; }
-        .tag-work { background:rgba(139,92,246,0.15); color:var(--accent); }
-        .tag-personal { background:rgba(6,182,212,0.15); color:var(--accent-2); }
-        .tag-study { background:rgba(245,158,11,0.15); color:var(--warning); }
-        .tag-urgent { background:rgba(239,68,68,0.15); color:var(--danger); }
-        .task-time { font-size:11px; color:var(--text-muted); }
-        .task-delete { position:absolute; right:12px; top:50%; transform:translateY(-50%); width:28px; height:28px; border-radius:6px; border:none; background:rgba(239,68,68,0.1); color:var(--danger); font-size:14px; cursor:pointer; opacity:0; transition:var(--transition); display:flex; align-items:center; justify-content:center; }
-        .task-card:hover .task-delete { opacity:1; }
-        @media(hover:none) { .task-delete { opacity:0.6; } }
-        .empty-state { text-align:center; padding:48px 0; color:var(--text-muted); }
-        .empty-state .empty-icon { font-size:48px; margin-bottom:12px; opacity:0.3; }
-        .empty-state p { font-size:14px; }
-        .notes-textarea { width:100%; min-height:100px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); color:var(--text-primary); font-family:inherit; font-size:13px; line-height:1.6; padding:14px 16px; resize:vertical; transition:var(--transition); }
-        .notes-textarea:focus { outline:none; border-color:var(--border-active); box-shadow:0 0 0 3px var(--accent-glow); }
-        .notes-textarea::placeholder { color:var(--text-muted); }
+        /* PAGES */
+        .page{display:none;max-width:480px;margin:0 auto;padding:16px 16px 100px}.page.active{display:block}
 
-        /* === FAB === */
-        .fab { position:fixed; bottom:24px; right:20px; width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg,var(--accent),#7c3aed); border:none; color:white; font-size:28px; font-weight:300; cursor:pointer; box-shadow:0 4px 24px rgba(139,92,246,0.4); transition:var(--transition); z-index:200; display:flex; align-items:center; justify-content:center; }
-        .fab:active { transform:scale(0.95); }
+        /* PLANNER */
+        .week-nav{display:flex;gap:4px;padding:4px;background:var(--bg-secondary);border-radius:var(--radius);border:1px solid var(--border);overflow-x:auto;scrollbar-width:none;margin-bottom:16px}
+        .week-nav::-webkit-scrollbar{display:none}
+        .day-btn{flex:1;min-width:48px;padding:8px 4px;background:none;border:none;border-radius:var(--radius-sm);color:var(--text-muted);font-family:inherit;font-size:11px;font-weight:600;text-transform:uppercase;cursor:pointer;transition:var(--transition);display:flex;flex-direction:column;align-items:center;gap:4px}
+        .day-btn .day-num{font-size:16px;font-weight:700;color:var(--text-secondary)}
+        .day-btn.active{background:var(--accent);color:white;box-shadow:0 2px 12px var(--accent-glow)}
+        .day-btn.active .day-num{color:white}
+        .day-btn.today:not(.active){border:1px solid var(--accent)}
+        .day-btn.has-tasks .day-num::after{content:'';display:block;width:4px;height:4px;background:var(--accent);border-radius:50%;margin:2px auto 0}
+        .day-btn.active.has-tasks .day-num::after{background:white}
+        .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+        .stat-pill{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center}
+        .stat-pill .stat-val{font-size:20px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .stat-pill .stat-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;font-weight:600;letter-spacing:.5px;margin-top:2px}
+        .section-label{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px}
+        .task-list{display:flex;flex-direction:column;gap:8px}
+        .task-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:var(--transition);position:relative;overflow:hidden}
+        .task-card:hover{background:var(--bg-card-hover);border-color:var(--border-active)}
+        .task-card.completed{opacity:.5}.task-card.completed .task-title{text-decoration:line-through}
+        .task-check{width:22px;height:22px;min-width:22px;border-radius:6px;border:2px solid var(--text-muted);display:flex;align-items:center;justify-content:center;margin-top:1px;transition:var(--transition);cursor:pointer}
+        .task-check.checked{background:var(--success);border-color:var(--success)}
+        .task-check.checked::after{content:'✓';color:white;font-size:12px;font-weight:800}
+        .task-content{flex:1;min-width:0}
+        .task-title{font-size:14px;font-weight:500;line-height:1.4;word-break:break-word}
+        .task-meta{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+        .task-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.3px}
+        .tag-work{background:rgba(139,92,246,.15);color:var(--accent)}.tag-personal{background:rgba(6,182,212,.15);color:var(--accent-2)}.tag-study{background:rgba(245,158,11,.15);color:var(--warning)}.tag-urgent{background:rgba(239,68,68,.15);color:var(--danger)}.tag-project{background:rgba(34,197,94,.15);color:var(--success)}.tag-gaming{background:rgba(236,72,153,.15);color:#ec4899}
+        .task-time{font-size:11px;color:var(--text-muted)}
+        .task-actions{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;gap:4px;opacity:0;transition:var(--transition)}
+        .task-card:hover .task-actions{opacity:1}
+        @media(hover:none){.task-actions{opacity:.6}}
+        .task-action-btn{width:28px;height:28px;border-radius:6px;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+        .task-edit-btn{background:rgba(139,92,246,.1);color:var(--accent)}
+        .task-del-btn{background:rgba(239,68,68,.1);color:var(--danger)}
+        .empty-state{text-align:center;padding:48px 0;color:var(--text-muted)}
+        .empty-state .empty-icon{font-size:48px;margin-bottom:12px;opacity:.3}
+        .empty-state p{font-size:14px}
+        .notes-textarea{width:100%;min-height:80px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-family:inherit;font-size:13px;line-height:1.6;padding:14px 16px;resize:vertical;transition:var(--transition)}
+        .notes-textarea:focus{outline:none;border-color:var(--border-active);box-shadow:0 0 0 3px var(--accent-glow)}
+        .notes-textarea::placeholder{color:var(--text-muted)}
 
-        /* === MODAL === */
-        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:300; display:none; align-items:flex-end; justify-content:center; }
-        .modal-overlay.active { display:flex; }
-        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-        .modal { width:100%; max-width:480px; background:var(--bg-secondary); border-radius:20px 20px 0 0; padding:24px; animation:slideUp 0.3s cubic-bezier(0.4,0,0.2,1); border-top:1px solid var(--border); }
-        .modal-handle { width:36px; height:4px; background:var(--text-muted); border-radius:2px; margin:0 auto 20px; opacity:0.5; }
-        .modal h2 { font-size:18px; font-weight:700; margin-bottom:20px; }
-        .input-group { margin-bottom:16px; }
-        .input-group label { display:block; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
-        .input-group input, .input-group select { width:100%; padding:12px 14px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-primary); font-family:inherit; font-size:14px; transition:var(--transition); }
-        .input-group input:focus, .input-group select:focus { outline:none; border-color:var(--border-active); box-shadow:0 0 0 3px var(--accent-glow); }
-        .tag-selector { display:flex; gap:8px; flex-wrap:wrap; }
-        .tag-option { padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); color:var(--text-secondary); font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; transition:var(--transition); }
-        .tag-option.selected { border-color:var(--accent); background:var(--accent-glow); color:var(--accent); }
-        .modal-actions { display:flex; gap:10px; margin-top:20px; }
-        .btn { flex:1; padding:14px; border-radius:var(--radius-sm); border:none; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; transition:var(--transition); }
-        .btn-primary { background:var(--accent); color:white; }
-        .btn-primary:hover { background:#7c3aed; }
-        .btn-secondary { background:var(--bg-card); color:var(--text-secondary); border:1px solid var(--border); }
+        /* FAB */
+        .fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--accent),#7c3aed);border:none;color:white;font-size:28px;font-weight:300;cursor:pointer;box-shadow:0 4px 24px rgba(139,92,246,.4);transition:var(--transition);z-index:200;display:flex;align-items:center;justify-content:center}
+        .fab:active{transform:scale(.95)}
 
-        /* === POMODORO === */
-        .pomo-container { display:flex; flex-direction:column; align-items:center; padding-top:20px; }
-        .pomo-ring { position:relative; width:240px; height:240px; margin-bottom:32px; }
-        .pomo-ring svg { width:100%; height:100%; transform:rotate(-90deg); }
-        .pomo-ring circle { fill:none; stroke-width:6; }
-        .pomo-ring .ring-bg { stroke:var(--border); }
-        .pomo-ring .ring-progress { stroke:var(--accent); stroke-linecap:round; transition:stroke-dashoffset 1s linear; }
-        .pomo-time { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-        .pomo-time .time-display { font-size:48px; font-weight:800; letter-spacing:-2px; font-variant-numeric:tabular-nums; }
-        .pomo-time .time-label { font-size:12px; color:var(--text-muted); text-transform:uppercase; font-weight:600; letter-spacing:1px; margin-top:4px; }
-        .pomo-controls { display:flex; gap:12px; margin-bottom:32px; }
-        .pomo-btn { width:56px; height:56px; border-radius:50%; border:1px solid var(--border); background:var(--bg-card); color:var(--text-primary); font-size:20px; cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; }
-        .pomo-btn.primary { background:var(--accent); border-color:var(--accent); color:white; width:64px; height:64px; font-size:24px; }
-        .pomo-btn:hover { border-color:var(--border-active); }
-        .pomo-modes { display:flex; gap:8px; }
-        .pomo-mode { padding:8px 16px; border-radius:20px; border:1px solid var(--border); background:var(--bg-card); color:var(--text-secondary); font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; transition:var(--transition); }
-        .pomo-mode.active { border-color:var(--accent); background:var(--accent-glow); color:var(--accent); }
-        .pomo-stats { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; width:100%; margin-top:24px; }
+        /* MODAL */
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:300;display:none;align-items:flex-end;justify-content:center}
+        .modal-overlay.active{display:flex}
+        @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+        .modal{width:100%;max-width:480px;background:var(--bg-secondary);border-radius:20px 20px 0 0;padding:24px;animation:slideUp .3s cubic-bezier(.4,0,.2,1);border-top:1px solid var(--border);max-height:85vh;overflow-y:auto}
+        .modal-handle{width:36px;height:4px;background:var(--text-muted);border-radius:2px;margin:0 auto 20px;opacity:.5}
+        .modal h2{font-size:18px;font-weight:700;margin-bottom:20px}
+        .input-group{margin-bottom:16px}
+        .input-group label{display:block;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+        .input-group input,.input-group select{width:100%;padding:12px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:inherit;font-size:14px;transition:var(--transition)}
+        .input-group input:focus{outline:none;border-color:var(--border-active);box-shadow:0 0 0 3px var(--accent-glow)}
+        .tag-selector{display:flex;gap:8px;flex-wrap:wrap}
+        .tag-option{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:var(--transition)}
+        .tag-option.selected{border-color:var(--accent);background:var(--accent-glow);color:var(--accent)}
+        .modal-actions{display:flex;gap:10px;margin-top:20px}
+        .btn{flex:1;padding:14px;border-radius:var(--radius-sm);border:none;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:var(--transition)}
+        .btn-primary{background:var(--accent);color:white}.btn-primary:hover{background:#7c3aed}
+        .btn-secondary{background:var(--bg-card);color:var(--text-secondary);border:1px solid var(--border)}
 
-        /* === SETTINGS === */
-        .setting-group { margin-bottom:24px; }
-        .setting-group h3 { font-size:13px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; }
-        .setting-row { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:8px; }
-        .setting-row .setting-label { font-size:14px; font-weight:500; }
-        .setting-row .setting-desc { font-size:11px; color:var(--text-muted); margin-top:2px; }
-        .toggle { position:relative; width:44px; height:24px; background:var(--text-muted); border-radius:12px; cursor:pointer; transition:var(--transition); border:none; }
-        .toggle.on { background:var(--accent); }
-        .toggle::after { content:''; position:absolute; width:20px; height:20px; background:white; border-radius:50%; top:2px; left:2px; transition:var(--transition); }
-        .toggle.on::after { left:22px; }
-        .setting-input { width:100%; padding:10px 14px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-primary); font-family:inherit; font-size:13px; margin-top:8px; }
-        .setting-input:focus { outline:none; border-color:var(--border-active); }
+        /* POMODORO */
+        .pomo-container{display:flex;flex-direction:column;align-items:center;padding-top:20px}
+        .pomo-ring{position:relative;width:220px;height:220px;margin-bottom:28px}
+        .pomo-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+        .pomo-ring circle{fill:none;stroke-width:6}
+        .pomo-ring .ring-bg{stroke:var(--border)}
+        .pomo-ring .ring-progress{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+        .pomo-time{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+        .pomo-time .time-display{font-size:44px;font-weight:800;letter-spacing:-2px;font-variant-numeric:tabular-nums}
+        .pomo-time .time-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;font-weight:600;letter-spacing:1px;margin-top:4px}
+        .pomo-controls{display:flex;gap:12px;margin-bottom:24px}
+        .pomo-btn{width:52px;height:52px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);font-size:18px;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center}
+        .pomo-btn.primary{background:var(--accent);border-color:var(--accent);color:white;width:60px;height:60px;font-size:22px}
+        .pomo-modes{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:8px}
+        .pomo-mode{padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:var(--transition)}
+        .pomo-mode.active{border-color:var(--accent);background:var(--accent-glow);color:var(--accent)}
+        .pomo-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%;margin-top:16px}
+
+        /* GYM */
+        .gym-exercise{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+        .gym-exercise-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+        .gym-exercise-name{font-size:15px;font-weight:600}
+        .gym-sets{display:flex;flex-direction:column;gap:6px}
+        .gym-set{display:grid;grid-template-columns:40px 1fr 1fr 80px;gap:8px;align-items:center;font-size:13px}
+        .gym-set-num{color:var(--text-muted);font-weight:700;font-size:12px}
+        .gym-input{width:100%;padding:8px;background:var(--bg-primary);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-family:inherit;font-size:13px;text-align:center}
+        .gym-input:focus{outline:none;border-color:var(--border-active)}
+        .gym-rest-btns{display:flex;gap:4px}
+        .gym-rest-btn{padding:4px 8px;border-radius:4px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);font-family:inherit;font-size:11px;cursor:pointer;transition:var(--transition)}
+        .gym-rest-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+        .gym-add-set{background:none;border:1px dashed var(--border);border-radius:6px;padding:8px;color:var(--text-muted);font-family:inherit;font-size:12px;width:100%;cursor:pointer;margin-top:8px;transition:var(--transition)}
+        .gym-add-set:hover{border-color:var(--accent);color:var(--accent)}
+        .rest-timer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:400;display:none;align-items:center;justify-content:center;flex-direction:column}
+        .rest-timer-overlay.active{display:flex}
+        .rest-timer-display{font-size:72px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+        .rest-timer-label{color:var(--text-muted);font-size:14px;margin-top:8px;margin-bottom:24px}
+
+        /* SETTINGS */
+        .setting-group{margin-bottom:24px}
+        .setting-group h3{font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+        .setting-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px}
+        .setting-label{font-size:14px;font-weight:500}
+        .setting-desc{font-size:11px;color:var(--text-muted);margin-top:2px}
+        .toggle{position:relative;width:44px;height:24px;background:var(--text-muted);border-radius:12px;cursor:pointer;transition:var(--transition);border:none}
+        .toggle.on{background:var(--accent)}
+        .toggle::after{content:'';position:absolute;width:20px;height:20px;background:white;border-radius:50%;top:2px;left:2px;transition:var(--transition)}
+        .toggle.on::after{left:22px}
+        .setting-input{width:100%;padding:10px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:inherit;font-size:13px;margin-top:8px}
+        .setting-input:focus{outline:none;border-color:var(--border-active)}
+        .custom-cat-row{display:flex;gap:8px;align-items:center}
+        .custom-cat-row input{flex:1}
     </style>
 </head>
 <body>
-    <!-- LOCK SCREEN -->
-    <div class="lock-screen" id="lockScreen">
-        <div class="lock-logo">🔒</div>
-        <div class="lock-title" id="lockTitle">Ingresá tu PIN</div>
-        <div class="lock-subtitle" id="lockSubtitle">4 dígitos para acceder</div>
-        <div class="pin-display" id="pinDisplay">
-            <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+<!-- SVG LOGO DEFINITION -->
+<svg style="display:none"><defs><symbol id="prismic-logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><path d="M50 20L62 38H74L58 58L65 80H50L35 80L42 58L26 38H38Z" fill="white" opacity="0.95"/><circle cx="50" cy="52" r="6" fill="white"/></symbol></defs></svg>
+
+<!-- LOCK -->
+<div class="lock-screen" id="lockScreen">
+    <svg class="lock-logo"><use href="#prismic-logo"/></svg>
+    <div class="lock-title" id="lockTitle">Ingresá tu PIN</div>
+    <div class="lock-subtitle" id="lockSubtitle">4 dígitos para acceder</div>
+    <div class="pin-display" id="pinDisplay"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
+    <div class="pin-keypad" id="pinKeypad">
+        <button class="pin-key" data-num="1">1</button><button class="pin-key" data-num="2">2</button><button class="pin-key" data-num="3">3</button>
+        <button class="pin-key" data-num="4">4</button><button class="pin-key" data-num="5">5</button><button class="pin-key" data-num="6">6</button>
+        <button class="pin-key" data-num="7">7</button><button class="pin-key" data-num="8">8</button><button class="pin-key" data-num="9">9</button>
+        <button class="pin-key" data-num=""></button><button class="pin-key" data-num="0">0</button><button class="pin-key key-back" data-num="back">⌫</button>
+    </div>
+    <div class="pin-error-msg" id="pinError"></div>
+    <div class="lock-links"><button class="lock-link" id="btnRecoverPin">¿Olvidaste tu PIN?</button></div>
+    <div class="recovery-form" id="recoveryForm">
+        <div class="lock-subtitle" style="margin-top:16px">Respondé tu pregunta de seguridad:</div>
+        <div id="recoveryQuestion" style="color:var(--accent);font-size:14px;font-weight:600;margin-bottom:12px;text-align:center"></div>
+        <input class="recovery-input" id="recoveryAnswer" placeholder="Tu respuesta..." autocomplete="off">
+        <div class="modal-actions"><button class="btn btn-secondary" id="btnRecoveryCancel">Volver</button><button class="btn btn-primary" id="btnRecoverySubmit">Verificar</button></div>
+    </div>
+</div>
+
+<!-- APP -->
+<div class="app-shell" id="appShell">
+    <div class="topbar">
+        <div class="topbar-left"><button class="hamburger" id="btnMenu">☰</button><svg class="topbar-logo"><use href="#prismic-logo"/></svg><div class="topbar-title"><span>Prismic</span> Planner</div></div>
+        <div class="topbar-right"><div class="sync-badge offline" id="syncIndicator"><span class="sync-dot"></span><span id="syncText">Local</span></div><button class="topbar-btn" id="btnLock" title="Bloquear">🔒</button></div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header"><svg style="width:32px;height:32px"><use href="#prismic-logo"/></svg><div class="sidebar-brand-text"><span>Prismic</span> Planner</div></div>
+        <div class="sidebar-nav">
+            <div class="nav-item active" data-page="planner"><span class="nav-icon">📋</span>Planner</div>
+            <div class="nav-item" data-page="pomodoro"><span class="nav-icon">🍅</span>Pomodoro</div>
+            <div class="nav-item" data-page="gym"><span class="nav-icon">💪</span>Gimnasio</div>
+            <div class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span>Configuración</div>
         </div>
-        <div class="pin-keypad" id="pinKeypad">
-            <button class="pin-key" data-num="1">1</button><button class="pin-key" data-num="2">2</button><button class="pin-key" data-num="3">3</button>
-            <button class="pin-key" data-num="4">4</button><button class="pin-key" data-num="5">5</button><button class="pin-key" data-num="6">6</button>
-            <button class="pin-key" data-num="7">7</button><button class="pin-key" data-num="8">8</button><button class="pin-key" data-num="9">9</button>
-            <button class="pin-key" data-num=""></button><button class="pin-key" data-num="0">0</button><button class="pin-key key-back" data-num="back">⌫</button>
-        </div>
-        <div class="pin-error-msg" id="pinError"></div>
-        <div class="lock-links">
-            <button class="lock-link" id="btnRecoverPin">¿Olvidaste tu PIN?</button>
-        </div>
-        <!-- Recovery form -->
-        <div class="recovery-form" id="recoveryForm">
-            <div class="lock-subtitle" style="margin-top:16px">Respondé tu pregunta de seguridad:</div>
-            <div id="recoveryQuestion" style="color:var(--accent);font-size:14px;font-weight:600;margin-bottom:12px;text-align:center"></div>
-            <input class="recovery-input" id="recoveryAnswer" placeholder="Tu respuesta..." autocomplete="off">
-            <div class="modal-actions">
-                <button class="btn btn-secondary" id="btnRecoveryCancel" style="flex:1">Volver</button>
-                <button class="btn btn-primary" id="btnRecoverySubmit" style="flex:1">Verificar</button>
+        <div class="sidebar-footer">Prismic Planner v2.5 — by Damian</div>
+    </nav>
+
+    <!-- PLANNER -->
+    <div class="page active" id="pagePlanner">
+        <div class="week-nav" id="weekNav"></div>
+        <div class="stats-row"><div class="stat-pill"><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total</div></div><div class="stat-pill"><div class="stat-val" id="statPending">0</div><div class="stat-label">Pendientes</div></div><div class="stat-pill"><div class="stat-val" id="statDone">0</div><div class="stat-label">Hechas</div></div></div>
+        <div class="section-label">Tareas del día</div>
+        <div class="task-list" id="taskList"></div>
+        <div style="margin-top:16px"><div class="section-label">Notas del día</div><textarea class="notes-textarea" id="dayNotes" placeholder="Escribí lo que necesites recordar..."></textarea></div>
+    </div>
+
+    <!-- POMODORO -->
+    <div class="page" id="pagePomodoro">
+        <div class="pomo-container">
+            <div class="pomo-modes">
+                <button class="pomo-mode active" data-mode="work">💼 Trabajo</button>
+                <button class="pomo-mode" data-mode="short">☕ Descanso</button>
+                <button class="pomo-mode" data-mode="long">🌴 Largo</button>
+                <button class="pomo-mode" data-mode="exercise">🏋️ Ejercicio</button>
+                <button class="pomo-mode" data-mode="gaming">🎮 Gaming</button>
+                <button class="pomo-mode" data-mode="custom">⚙️ Custom</button>
             </div>
+            <div class="pomo-ring"><svg viewBox="0 0 200 200"><circle class="ring-bg" cx="100" cy="100" r="90"/><circle class="ring-progress" id="pomoRing" cx="100" cy="100" r="90" stroke-dasharray="565.48" stroke-dashoffset="0"/></svg><div class="pomo-time"><div class="time-display" id="pomoTime">25:00</div><div class="time-label" id="pomoLabel">Trabajo</div></div></div>
+            <div class="pomo-controls"><button class="pomo-btn" id="pomoReset">↺</button><button class="pomo-btn primary" id="pomoToggle">▶</button><button class="pomo-btn" id="pomoSkip">⏭</button></div>
+            <div class="pomo-stats"><div class="stat-pill"><div class="stat-val" id="pomoCount">0</div><div class="stat-label">Pomodoros</div></div><div class="stat-pill"><div class="stat-val" id="pomoTotal">0h 0m</div><div class="stat-label">Tiempo total</div></div></div>
         </div>
     </div>
 
-    <!-- APP SHELL -->
-    <div class="app-shell" id="appShell">
-        <!-- TOPBAR -->
-        <div class="topbar">
-            <div class="topbar-left">
-                <button class="hamburger" id="btnMenu">☰</button>
-                <div class="topbar-title"><span>Prismic</span> Planner</div>
-            </div>
-            <div class="topbar-right">
-                <div class="sync-badge offline" id="syncIndicator"><span class="sync-dot"></span><span id="syncText">Local</span></div>
-                <button class="topbar-btn" id="btnLock" title="Bloquear">🔒</button>
-            </div>
-        </div>
-        <!-- SIDEBAR -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
-        <nav class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-brand"><div class="sidebar-brand-icon">⚡</div><div class="sidebar-brand-text"><span>Prismic</span> Planner</div></div>
-            </div>
-            <div class="sidebar-nav">
-                <div class="nav-item active" data-page="planner"><span class="nav-icon">📋</span>Planner</div>
-                <div class="nav-item" data-page="pomodoro"><span class="nav-icon">🍅</span>Pomodoro</div>
-                <div class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span>Configuración</div>
-            </div>
-            <div class="sidebar-footer">Prismic Planner v2.0 — by Damian</div>
-        </nav>
-        <!-- PLANNER PAGE -->
-        <div class="page active" id="pagePlanner">
-            <div class="week-nav" id="weekNav"></div>
-            <div class="stats-row">
-                <div class="stat-pill"><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total</div></div>
-                <div class="stat-pill"><div class="stat-val" id="statPending">0</div><div class="stat-label">Pendientes</div></div>
-                <div class="stat-pill"><div class="stat-val" id="statDone">0</div><div class="stat-label">Hechas</div></div>
-            </div>
-            <div class="section-label">Tareas del día</div>
-            <div class="task-list" id="taskList"></div>
-            <div style="margin-top:16px">
-                <div class="section-label">Notas del día</div>
-                <textarea class="notes-textarea" id="dayNotes" placeholder="Escribí lo que necesites recordar..."></textarea>
-            </div>
-        </div>
-        <!-- POMODORO PAGE -->
-        <div class="page" id="pagePomodoro">
-            <div class="pomo-container">
-                <div class="pomo-modes">
-                    <button class="pomo-mode active" data-mode="work">Trabajo</button>
-                    <button class="pomo-mode" data-mode="short">Descanso</button>
-                    <button class="pomo-mode" data-mode="long">Descanso largo</button>
-                </div>
-                <div class="pomo-ring">
-                    <svg viewBox="0 0 200 200"><circle class="ring-bg" cx="100" cy="100" r="90"/><circle class="ring-progress" id="pomoRing" cx="100" cy="100" r="90" stroke-dasharray="565.48" stroke-dashoffset="0"/></svg>
-                    <div class="pomo-time"><div class="time-display" id="pomoTime">25:00</div><div class="time-label" id="pomoLabel">Trabajo</div></div>
-                </div>
-                <div class="pomo-controls">
-                    <button class="pomo-btn" id="pomoReset" title="Reiniciar">↺</button>
-                    <button class="pomo-btn primary" id="pomoToggle" title="Iniciar">▶</button>
-                    <button class="pomo-btn" id="pomoSkip" title="Saltar">⏭</button>
-                </div>
-                <div class="pomo-stats">
-                    <div class="stat-pill"><div class="stat-val" id="pomoCount">0</div><div class="stat-label">Pomodoros</div></div>
-                    <div class="stat-pill"><div class="stat-val" id="pomoTotal">0h 0m</div><div class="stat-label">Tiempo total</div></div>
-                </div>
-            </div>
-        </div>
-        <!-- SETTINGS PAGE -->
-        <div class="page" id="pageSettings">
-            <div class="setting-group">
-                <h3>Apariencia</h3>
-                <div class="setting-row"><div><div class="setting-label">Tema oscuro</div><div class="setting-desc">Alternar entre modo oscuro y claro</div></div><button class="toggle on" id="toggleTheme"></button></div>
-            </div>
-            <div class="setting-group">
-                <h3>Seguridad</h3>
-                <div class="setting-row"><div><div class="setting-label">Recordarme</div><div class="setting-desc">No pedir PIN por 4 horas</div></div><button class="toggle" id="toggleRemember"></button></div>
-                <div class="setting-row" style="flex-direction:column;align-items:stretch"><div class="setting-label">Cambiar PIN</div><input class="setting-input" id="newPinInput" type="password" maxlength="4" placeholder="Nuevo PIN de 4 dígitos"><button class="btn btn-primary" id="btnChangePin" style="margin-top:8px">Actualizar PIN</button></div>
-                <div class="setting-row" style="flex-direction:column;align-items:stretch"><div class="setting-label">Pregunta de seguridad</div><input class="setting-input" id="securityQuestion" placeholder="Ej: ¿Nombre de tu primera mascota?"><input class="setting-input" id="securityAnswer" type="password" placeholder="Respuesta"><button class="btn btn-primary" id="btnSaveQuestion" style="margin-top:8px">Guardar pregunta</button></div>
-            </div>
-            <div class="setting-group">
-                <h3>Sincronización</h3>
-                <div class="setting-row" style="flex-direction:column;align-items:stretch"><div class="setting-label">URL del Apps Script</div><div class="setting-desc" style="margin-bottom:8px">Conectá tu Google Sheet para sincronizar entre dispositivos</div><input class="setting-input" id="syncUrlInput" type="url" placeholder="https://script.google.com/macros/s/..."><button class="btn btn-primary" id="btnSaveSync" style="margin-top:8px">Guardar y Sincronizar</button></div>
-            </div>
-            <div class="setting-group">
-                <h3>Pomodoro</h3>
-                <div class="setting-row"><div><div class="setting-label">Trabajo</div></div><input class="setting-input" id="pomoWorkMin" type="number" min="1" max="60" value="25" style="width:60px;text-align:center"></div>
-                <div class="setting-row"><div><div class="setting-label">Descanso</div></div><input class="setting-input" id="pomoShortMin" type="number" min="1" max="30" value="5" style="width:60px;text-align:center"></div>
-                <div class="setting-row"><div><div class="setting-label">Descanso largo</div></div><input class="setting-input" id="pomoLongMin" type="number" min="1" max="60" value="15" style="width:60px;text-align:center"></div>
-            </div>
-        </div>
-        <!-- FAB (only on planner) -->
-        <button class="fab" id="fabAdd" title="Agregar tarea">+</button>
+    <!-- GYM -->
+    <div class="page" id="pageGym">
+        <div class="section-label">Rutina de hoy</div>
+        <div id="gymList"></div>
+        <button class="btn btn-primary" id="btnAddExercise" style="margin-top:16px;width:100%">+ Agregar ejercicio</button>
     </div>
 
-    <!-- TASK MODAL -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <div class="modal-handle"></div>
-            <h2>Nueva tarea</h2>
-            <div class="input-group"><label>Descripción</label><input type="text" id="taskInput" placeholder="¿Qué tenés que hacer?" autocomplete="off"></div>
-            <div class="input-group"><label>Hora (opcional)</label><input type="time" id="taskTime"></div>
-            <div class="input-group"><label>Categoría</label><div class="tag-selector" id="tagSelector"><button class="tag-option selected" data-tag="work">💼 Trabajo</button><button class="tag-option" data-tag="personal">🏠 Personal</button><button class="tag-option" data-tag="study">📚 Estudio</button><button class="tag-option" data-tag="urgent">🔥 Urgente</button></div></div>
-            <div class="modal-actions"><button class="btn btn-secondary" id="btnCancel">Cancelar</button><button class="btn btn-primary" id="btnSave">Guardar</button></div>
+    <!-- SETTINGS -->
+    <div class="page" id="pageSettings">
+        <div class="setting-group"><h3>Apariencia</h3><div class="setting-row"><div><div class="setting-label">Tema oscuro</div></div><button class="toggle on" id="toggleTheme"></button></div></div>
+        <div class="setting-group"><h3>Seguridad</h3>
+            <div class="setting-row"><div><div class="setting-label">Recordarme (4h)</div></div><button class="toggle" id="toggleRemember"></button></div>
+            <div class="setting-row" style="flex-direction:column;align-items:stretch"><div class="setting-label">Cambiar PIN</div><input class="setting-input" id="newPinInput" type="password" maxlength="4" placeholder="Nuevo PIN de 4 dígitos"><button class="btn btn-primary" id="btnChangePin" style="margin-top:8px">Actualizar</button></div>
+            <div class="setting-row" style="flex-direction:column;align-items:stretch"><div class="setting-label">Pregunta de seguridad</div><input class="setting-input" id="securityQuestion" placeholder="Ej: ¿Nombre de tu mascota?"><input class="setting-input" id="securityAnswer" type="password" placeholder="Respuesta"><button class="btn btn-primary" id="btnSaveQuestion" style="margin-top:8px">Guardar</button></div>
+        </div>
+        <div class="setting-group"><h3>Sincronización</h3>
+            <div class="setting-row" style="flex-direction:column;align-items:stretch"><div class="setting-label">URL Apps Script</div><input class="setting-input" id="syncUrlInput" type="url" placeholder="https://script.google.com/macros/s/..."><button class="btn btn-primary" id="btnSaveSync" style="margin-top:8px">Guardar y Sincronizar</button></div>
+        </div>
+        <div class="setting-group"><h3>Categorías personalizadas</h3>
+            <div id="customCatList"></div>
+            <div class="custom-cat-row" style="margin-top:8px"><input class="setting-input" id="newCatIcon" placeholder="Emoji" style="width:60px;flex:none;text-align:center"><input class="setting-input" id="newCatName" placeholder="Nombre de la categoría"><button class="btn btn-primary" id="btnAddCat" style="margin-top:0;flex:none;padding:10px 16px">+</button></div>
+        </div>
+        <div class="setting-group"><h3>Pomodoro (minutos)</h3>
+            <div class="setting-row"><div class="setting-label">💼 Trabajo</div><input class="setting-input pomo-setting" id="pomoWorkMin" type="number" min="1" max="90" value="25" style="width:60px;text-align:center;margin:0"></div>
+            <div class="setting-row"><div class="setting-label">☕ Descanso</div><input class="setting-input pomo-setting" id="pomoShortMin" type="number" min="1" max="30" value="5" style="width:60px;text-align:center;margin:0"></div>
+            <div class="setting-row"><div class="setting-label">🌴 Largo</div><input class="setting-input pomo-setting" id="pomoLongMin" type="number" min="1" max="60" value="15" style="width:60px;text-align:center;margin:0"></div>
+            <div class="setting-row"><div class="setting-label">🏋️ Ejercicio</div><input class="setting-input pomo-setting" id="pomoExerciseMin" type="number" min="1" max="90" value="45" style="width:60px;text-align:center;margin:0"></div>
+            <div class="setting-row"><div class="setting-label">🎮 Gaming</div><input class="setting-input pomo-setting" id="pomoGamingMin" type="number" min="1" max="120" value="60" style="width:60px;text-align:center;margin:0"></div>
+            <div class="setting-row"><div class="setting-label">⚙️ Custom</div><input class="setting-input pomo-setting" id="pomoCustomMin" type="number" min="1" max="120" value="30" style="width:60px;text-align:center;margin:0"></div>
         </div>
     </div>
+    <button class="fab" id="fabAdd">+</button>
+</div>
 
-    <script>
-    // ==============================
-    // CONSTANTS
-    // ==============================
-    const STORAGE_KEY = 'prismic_planner_data';
-    const SYNC_URL_KEY = 'prismic_sync_url';
-    const PIN_HASH_KEY = 'prismic_pin_hash';
-    const SECURITY_Q_KEY = 'prismic_security_q';
-    const SECURITY_A_KEY = 'prismic_security_a';
-    const SESSION_KEY = 'prismic_session';
-    const THEME_KEY = 'prismic_theme';
-    const REMEMBER_KEY = 'prismic_remember';
-    const POMO_SETTINGS_KEY = 'prismic_pomo_settings';
-    const CIRCUMFERENCE = 2 * Math.PI * 90; // ~565.48
+<!-- TASK MODAL -->
+<div class="modal-overlay" id="modalOverlay"><div class="modal"><div class="modal-handle"></div><h2 id="modalTitle">Nueva tarea</h2>
+    <div class="input-group"><label>Descripción</label><input type="text" id="taskInput" placeholder="¿Qué tenés que hacer?" autocomplete="off"></div>
+    <div class="input-group"><label>Hora (opcional)</label><input type="time" id="taskTime"></div>
+    <div class="input-group"><label>Categoría</label><div class="tag-selector" id="tagSelector"></div></div>
+    <div class="modal-actions"><button class="btn btn-secondary" id="btnCancel">Cancelar</button><button class="btn btn-primary" id="btnSave">Guardar</button></div>
+</div></div>
 
-    // ==============================
-    // STATE
-    // ==============================
-    let state = { selectedDate: getTodayStr(), tasks: {}, notes: {} };
-    let syncDebounceTimer;
-    let currentPin = '', isCreatingPin = false, newPinFirst = '', pinAttempts = 0;
-    const MAX_ATTEMPTS = 5;
+<!-- GYM MODAL -->
+<div class="modal-overlay" id="gymModal"><div class="modal"><div class="modal-handle"></div><h2>Nuevo ejercicio</h2>
+    <div class="input-group"><label>Nombre del ejercicio</label><input type="text" id="gymExName" placeholder="Ej: Press banca" autocomplete="off"></div>
+    <div class="input-group"><label>Descanso entre series</label>
+        <div class="gym-rest-btns"><button class="gym-rest-btn active" data-rest="60">1 min</button><button class="gym-rest-btn" data-rest="90">1.5 min</button><button class="gym-rest-btn" data-rest="120">2 min</button></div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-secondary" id="btnGymCancel">Cancelar</button><button class="btn btn-primary" id="btnGymSave">Agregar</button></div>
+</div></div>
 
-    // Pomodoro
-    let pomoState = { mode:'work', running:false, timeLeft:25*60, interval:null, completed:0, totalSeconds:0 };
-    let pomoSettings = { work:25, short:5, long:15 };
+<!-- REST TIMER -->
+<div class="rest-timer-overlay" id="restTimerOverlay"><div class="rest-timer-display" id="restTimerDisplay">60</div><div class="rest-timer-label">Descanso entre series</div><button class="btn btn-secondary" id="btnSkipRest" style="width:auto;padding:12px 32px">Saltar</button></div>
 
-    function getTodayStr() { return new Date().toISOString().split('T')[0]; }
+<script>
+// CONSTANTS
+const STORAGE_KEY='prismic_planner_data',SYNC_URL_KEY='prismic_sync_url',PIN_HASH_KEY='prismic_pin_hash',SECURITY_Q_KEY='prismic_security_q',SECURITY_A_KEY='prismic_security_a',SESSION_KEY='prismic_session',THEME_KEY='prismic_theme',REMEMBER_KEY='prismic_remember',POMO_SETTINGS_KEY='prismic_pomo_settings',CUSTOM_CATS_KEY='prismic_custom_cats',GYM_KEY='prismic_gym_data',CIRC=2*Math.PI*90;
 
-    // ==============================
-    // AUTH (PIN)
-    // ==============================
-    async function hashPin(pin) {
-        const data = new TextEncoder().encode('prismic_salt_' + pin);
-        const buf = await crypto.subtle.digest('SHA-256', data);
-        return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-    }
+// DEFAULT CATEGORIES
+const defaultCats=[{id:'work',icon:'💼',name:'Trabajo'},{id:'personal',icon:'🏠',name:'Personal'},{id:'study',icon:'📚',name:'Estudio'},{id:'urgent',icon:'🔥',name:'Urgente'},{id:'project',icon:'🚀',name:'Proyecto'},{id:'gaming',icon:'🎮',name:'Juego'}];
 
-    function hasPinSet() { return !!localStorage.getItem(PIN_HASH_KEY); }
+function getAllCats(){const custom=JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY)||'[]');return[...defaultCats,...custom]}
 
-    function hasValidSession() {
-        if (localStorage.getItem(REMEMBER_KEY) !== 'true') return false;
-        const s = localStorage.getItem(SESSION_KEY);
-        if (!s) return false;
-        return Date.now() - parseInt(s) < 4*60*60*1000; // 4 hours
-    }
+// STATE
+let state={selectedDate:getTodayStr(),tasks:{},notes:{}};
+let syncDebounceTimer,currentPin='',isCreatingPin=false,newPinFirst='',pinAttempts=0,editingTaskIdx=-1;
+const MAX_ATTEMPTS=5;
+let pomoState={mode:'work',running:false,timeLeft:25*60,interval:null,completed:0,totalSeconds:0};
+let pomoSettings={work:25,short:5,long:15,exercise:45,gaming:60,custom:30};
+let gymData={};
+let gymRestSeconds=60;
 
-    function initAuth() {
-        if (hasValidSession()) { unlockApp(); return; }
-        const lockScreen = document.getElementById('lockScreen');
-        lockScreen.classList.remove('hidden');
-        document.getElementById('recoveryForm').classList.remove('active');
-        document.getElementById('pinKeypad').style.display = '';
-        document.getElementById('pinDisplay').style.display = '';
-        document.getElementById('btnRecoverPin').style.display = '';
-        if (!hasPinSet()) {
-            isCreatingPin = true;
-            document.getElementById('lockTitle').textContent = 'Creá tu PIN';
-            document.getElementById('lockSubtitle').textContent = 'Elegí 4 dígitos para proteger tu planner';
-            document.getElementById('btnRecoverPin').style.display = 'none';
-        } else {
-            isCreatingPin = false;
-            document.getElementById('lockTitle').textContent = 'Ingresá tu PIN';
-            document.getElementById('lockSubtitle').textContent = '4 dígitos para acceder';
-        }
-        currentPin = ''; newPinFirst = '';
-        updatePinDots();
-    }
+function getTodayStr(){return new Date().toISOString().split('T')[0]}
 
-    function updatePinDots() {
-        document.querySelectorAll('#pinDisplay .pin-dot').forEach((d,i) => {
-            d.classList.toggle('filled', i < currentPin.length);
-            d.classList.remove('error');
-        });
-    }
+// AUTH
+async function hashPin(p){const d=new TextEncoder().encode('prismic_salt_'+p);const b=await crypto.subtle.digest('SHA-256',d);return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+function hasPinSet(){return!!localStorage.getItem(PIN_HASH_KEY)}
+function hasValidSession(){if(localStorage.getItem(REMEMBER_KEY)!=='true')return false;const s=localStorage.getItem(SESSION_KEY);return s&&Date.now()-parseInt(s)<4*3600000}
+function initAuth(){
+    if(hasValidSession()){unlockApp();return}
+    const ls=document.getElementById('lockScreen');ls.classList.remove('hidden');
+    document.getElementById('recoveryForm').classList.remove('active');
+    document.getElementById('pinKeypad').style.display='';document.getElementById('pinDisplay').style.display='';document.getElementById('btnRecoverPin').style.display='';
+    if(!hasPinSet()){isCreatingPin=true;document.getElementById('lockTitle').textContent='Creá tu PIN';document.getElementById('lockSubtitle').textContent='Elegí 4 dígitos para proteger tu planner';document.getElementById('btnRecoverPin').style.display='none'}
+    else{isCreatingPin=false;document.getElementById('lockTitle').textContent='Ingresá tu PIN';document.getElementById('lockSubtitle').textContent='4 dígitos para acceder'}
+    currentPin='';newPinFirst='';updatePinDots();
+}
+function updatePinDots(){document.querySelectorAll('#pinDisplay .pin-dot').forEach((d,i)=>{d.classList.toggle('filled',i<currentPin.length);d.classList.remove('error')})}
+function showPinError(m){document.getElementById('pinError').textContent=m;document.querySelectorAll('#pinDisplay .pin-dot').forEach(d=>{d.classList.add('error');d.classList.remove('filled')});document.getElementById('pinDisplay').classList.add('shake');setTimeout(()=>{document.getElementById('pinDisplay').classList.remove('shake');currentPin='';updatePinDots()},500)}
+async function handlePinComplete(){
+    if(isCreatingPin){if(!newPinFirst){newPinFirst=currentPin;currentPin='';document.getElementById('lockTitle').textContent='Confirmá tu PIN';document.getElementById('lockSubtitle').textContent='Ingresalo de nuevo';updatePinDots()}else{if(currentPin===newPinFirst){localStorage.setItem(PIN_HASH_KEY,await hashPin(currentPin));showSecuritySetup()}else{newPinFirst='';document.getElementById('lockTitle').textContent='Creá tu PIN';document.getElementById('lockSubtitle').textContent='Elegí 4 dígitos';showPinError('No coinciden.')}}}
+    else{const h=await hashPin(currentPin);if(h===localStorage.getItem(PIN_HASH_KEY)){pinAttempts=0;unlockApp()}else{pinAttempts++;const r=MAX_ATTEMPTS-pinAttempts;if(r<=0){showPinError('Demasiados intentos.');document.getElementById('pinKeypad').style.pointerEvents='none'}else showPinError(`Incorrecto. ${r} intento${r>1?'s':''}.`)}}
+}
+function showSecuritySetup(){document.getElementById('pinKeypad').style.display='none';document.getElementById('pinDisplay').style.display='none';document.getElementById('btnRecoverPin').style.display='none';document.getElementById('lockTitle').textContent='Pregunta de seguridad';document.getElementById('lockSubtitle').textContent='Para recuperar tu PIN';const f=document.getElementById('recoveryForm');f.classList.add('active');f.innerHTML='<input class="recovery-input" id="setupQuestion" placeholder="Ej: ¿Nombre de tu mascota?"><input class="recovery-input" id="setupAnswer" placeholder="Tu respuesta"><div class="modal-actions"><button class="btn btn-secondary" onclick="skipSecurity()">Omitir</button><button class="btn btn-primary" onclick="saveSecurity()">Guardar</button></div>'}
+function saveSecurity(){const q=document.getElementById('setupQuestion').value.trim(),a=document.getElementById('setupAnswer').value.trim().toLowerCase();if(q&&a){localStorage.setItem(SECURITY_Q_KEY,q);localStorage.setItem(SECURITY_A_KEY,a)}unlockApp()}
+function skipSecurity(){unlockApp()}
+async function unlockApp(){document.getElementById('lockScreen').classList.add('hidden');document.getElementById('appShell').classList.add('active');if(localStorage.getItem(REMEMBER_KEY)==='true')localStorage.setItem(SESSION_KEY,Date.now().toString());loadState();loadPomoSettings();loadTheme();loadGym();renderCatSelector();render();renderCustomCatList();await pullFromCloud();render()}
+function lockApp(){document.getElementById('appShell').classList.remove('active');localStorage.removeItem(SESSION_KEY);pinAttempts=0;currentPin='';newPinFirst='';document.getElementById('pinError').textContent='';document.getElementById('pinKeypad').style.pointerEvents='';initAuth()}
 
-    function showPinError(msg) {
-        document.getElementById('pinError').textContent = msg;
-        document.querySelectorAll('#pinDisplay .pin-dot').forEach(d => { d.classList.add('error'); d.classList.remove('filled'); });
-        document.getElementById('pinDisplay').classList.add('shake');
-        setTimeout(() => { document.getElementById('pinDisplay').classList.remove('shake'); currentPin=''; updatePinDots(); }, 500);
-    }
+// PIN keypad
+document.getElementById('pinKeypad').addEventListener('click',e=>{const k=e.target.closest('.pin-key');if(!k)return;const n=k.dataset.num;if(n==='back'){currentPin=currentPin.slice(0,-1);document.getElementById('pinError').textContent='';updatePinDots();return}if(n===''||currentPin.length>=4)return;currentPin+=n;updatePinDots();if(currentPin.length===4)setTimeout(()=>handlePinComplete(),200)});
+document.addEventListener('keydown',e=>{if(!document.getElementById('lockScreen').classList.contains('hidden')&&document.getElementById('pinKeypad').style.display!=='none'){if(e.key>='0'&&e.key<='9'&&currentPin.length<4){currentPin+=e.key;updatePinDots();if(currentPin.length===4)setTimeout(()=>handlePinComplete(),200)}else if(e.key==='Backspace'){currentPin=currentPin.slice(0,-1);updatePinDots()}}});
 
-    async function handlePinComplete() {
-        if (isCreatingPin) {
-            if (!newPinFirst) {
-                newPinFirst = currentPin; currentPin = '';
-                document.getElementById('lockTitle').textContent = 'Confirmá tu PIN';
-                document.getElementById('lockSubtitle').textContent = 'Ingresalo de nuevo';
-                updatePinDots();
-            } else {
-                if (currentPin === newPinFirst) {
-                    localStorage.setItem(PIN_HASH_KEY, await hashPin(currentPin));
-                    // Show security question setup
-                    showSecuritySetup();
-                } else {
-                    newPinFirst = '';
-                    document.getElementById('lockTitle').textContent = 'Creá tu PIN';
-                    document.getElementById('lockSubtitle').textContent = 'Elegí 4 dígitos';
-                    showPinError('No coinciden. Intentá de nuevo.');
-                }
-            }
-        } else {
-            const hash = await hashPin(currentPin);
-            if (hash === localStorage.getItem(PIN_HASH_KEY)) {
-                pinAttempts = 0; unlockApp();
-            } else {
-                pinAttempts++;
-                const rem = MAX_ATTEMPTS - pinAttempts;
-                if (rem <= 0) { showPinError('Demasiados intentos. Recargá.'); document.getElementById('pinKeypad').style.pointerEvents='none'; }
-                else showPinError(`PIN incorrecto. ${rem} intento${rem>1?'s':''}.`);
-            }
-        }
-    }
+// Recovery
+document.getElementById('btnRecoverPin').addEventListener('click',()=>{const q=localStorage.getItem(SECURITY_Q_KEY);if(!q){document.getElementById('pinError').textContent='No hay pregunta configurada.';return}document.getElementById('pinKeypad').style.display='none';document.getElementById('pinDisplay').style.display='none';document.getElementById('btnRecoverPin').style.display='none';document.getElementById('lockTitle').textContent='Recuperar PIN';document.getElementById('lockSubtitle').textContent='';document.getElementById('pinError').textContent='';const f=document.getElementById('recoveryForm');f.classList.add('active');document.getElementById('recoveryQuestion').textContent=q;const ans=f.querySelector('#recoveryAnswer');if(ans)ans.value=''});
+document.getElementById('btnRecoveryCancel')?.addEventListener('click',()=>initAuth());
+document.getElementById('btnRecoverySubmit')?.addEventListener('click',()=>{const a=document.getElementById('recoveryAnswer').value.trim().toLowerCase();if(a===localStorage.getItem(SECURITY_A_KEY)){localStorage.removeItem(PIN_HASH_KEY);localStorage.removeItem(SESSION_KEY);initAuth()}else document.getElementById('pinError').textContent='Respuesta incorrecta.'});
+document.getElementById('btnLock').addEventListener('click',lockApp);
 
-    function showSecuritySetup() {
-        document.getElementById('pinKeypad').style.display = 'none';
-        document.getElementById('pinDisplay').style.display = 'none';
-        document.getElementById('btnRecoverPin').style.display = 'none';
-        document.getElementById('lockTitle').textContent = 'Pregunta de seguridad';
-        document.getElementById('lockSubtitle').textContent = 'Para recuperar tu PIN si lo olvidás';
-        const form = document.getElementById('recoveryForm');
-        form.classList.add('active');
-        form.innerHTML = `
-            <input class="recovery-input" id="setupQuestion" placeholder="Ej: ¿Nombre de tu primera mascota?">
-            <input class="recovery-input" id="setupAnswer" placeholder="Tu respuesta">
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="skipSecurity()">Omitir</button>
-                <button class="btn btn-primary" onclick="saveSecurity()">Guardar</button>
-            </div>`;
-    }
+// STATE
+function loadState(){try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.tasks=p.tasks||{};state.notes=p.notes||{}}}catch(e){}}
+function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify({tasks:state.tasks,notes:state.notes}));clearTimeout(syncDebounceTimer);syncDebounceTimer=setTimeout(()=>pushToCloud(),2000)}
 
-    function saveSecurity() {
-        const q = document.getElementById('setupQuestion').value.trim();
-        const a = document.getElementById('setupAnswer').value.trim().toLowerCase();
-        if (q && a) { localStorage.setItem(SECURITY_Q_KEY, q); localStorage.setItem(SECURITY_A_KEY, a); }
-        unlockApp();
-    }
+// SYNC
+function getSyncUrl(){return localStorage.getItem(SYNC_URL_KEY)||''}
+function setSyncUrl(u){localStorage.setItem(SYNC_URL_KEY,u)}
+function updateSyncUI(s,t){const e=document.getElementById('syncIndicator'),x=document.getElementById('syncText');e.className='sync-badge '+s;x.textContent=t}
+async function pushToCloud(){const u=getSyncUrl();if(!u)return;updateSyncUI('syncing','Subiendo...');try{await fetch(u,{method:'POST',body:JSON.stringify({tasks:state.tasks,notes:state.notes}),headers:{'Content-Type':'text/plain'}});updateSyncUI('synced','Sync ✓')}catch(e){updateSyncUI('error','Error')}}
+async function pullFromCloud(){const u=getSyncUrl();if(!u){updateSyncUI('offline','Local');return}updateSyncUI('syncing','Bajando...');try{const r=await fetch(u);if(!r.ok)throw 0;const txt=await r.text();let d;try{d=JSON.parse(txt)}catch(e){d=JSON.parse(JSON.parse(txt))}if(d&&!d.error){const mt={...state.tasks},mn={...state.notes};if(d.tasks)for(const[k,v]of Object.entries(d.tasks))mt[k]=v;if(d.notes)for(const[k,v]of Object.entries(d.notes))mn[k]=v;state.tasks=mt;state.notes=mn;localStorage.setItem(STORAGE_KEY,JSON.stringify({tasks:state.tasks,notes:state.notes}))}updateSyncUI('synced','Sync ✓')}catch(e){updateSyncUI('error','Sin conexión')}}
 
-    function skipSecurity() { unlockApp(); }
+// NAV
+const sidebar=document.getElementById('sidebar'),sOverlay=document.getElementById('sidebarOverlay');
+document.getElementById('btnMenu').addEventListener('click',()=>{sidebar.classList.add('open');sOverlay.classList.add('active')});
+sOverlay.addEventListener('click',closeSidebar);
+function closeSidebar(){sidebar.classList.remove('open');sOverlay.classList.remove('active')}
+document.querySelectorAll('.nav-item').forEach(item=>{item.addEventListener('click',()=>{const pg=item.dataset.page;document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));item.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page'+pg.charAt(0).toUpperCase()+pg.slice(1)).classList.add('active');document.getElementById('fabAdd').style.display=pg==='planner'?'':'none';closeSidebar()})});
 
-    async function unlockApp() {
-        document.getElementById('lockScreen').classList.add('hidden');
-        document.getElementById('appShell').classList.add('active');
-        if (localStorage.getItem(REMEMBER_KEY) === 'true') localStorage.setItem(SESSION_KEY, Date.now().toString());
-        loadState(); loadPomoSettings(); loadTheme(); render();
-        await pullFromCloud(); render();
-    }
+// RENDER PLANNER
+const DAYS_SHORT=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'],MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+function getWeekDates(ref){const d=new Date(ref+'T12:00:00'),dow=d.getDay(),mon=new Date(d);mon.setDate(d.getDate()-((dow+6)%7));return Array.from({length:7},(_,i)=>{const x=new Date(mon);x.setDate(mon.getDate()+i);return x.toISOString().split('T')[0]})}
+function render(){renderWeekNav();renderStats();renderTasks();renderNotes()}
+function renderWeekNav(){const nav=document.getElementById('weekNav'),week=getWeekDates(state.selectedDate),today=getTodayStr();nav.innerHTML=week.map(ds=>{const d=new Date(ds+'T12:00:00'),a=ds===state.selectedDate,t=ds===today,h=(state.tasks[ds]||[]).length>0;let c='day-btn';if(a)c+=' active';if(t&&!a)c+=' today';if(h)c+=' has-tasks';return`<button class="${c}" data-date="${ds}"><span>${DAYS_SHORT[d.getDay()]}</span><span class="day-num">${d.getDate()}</span></button>`}).join('');nav.querySelectorAll('.day-btn').forEach(b=>b.addEventListener('click',()=>{state.selectedDate=b.dataset.date;render()}))}
+function renderStats(){const t=state.tasks[state.selectedDate]||[],total=t.length,done=t.filter(x=>x.completed).length;document.getElementById('statTotal').textContent=total;document.getElementById('statPending').textContent=total-done;document.getElementById('statDone').textContent=done}
+function escapeHtml(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}
+function renderTasks(){
+    const list=document.getElementById('taskList'),tasks=state.tasks[state.selectedDate]||[],cats=getAllCats();
+    if(!tasks.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>No hay tareas para este día</p></div>';return}
+    const sorted=[...tasks].sort((a,b)=>a.completed-b.completed);
+    list.innerHTML=sorted.map(task=>{const idx=tasks.indexOf(task);const cat=cats.find(c=>c.id===task.tag)||cats[0];const tagClass=defaultCats.find(c=>c.id===task.tag)?`tag-${task.tag}`:'';const tagStyle=tagClass?'':`background:rgba(139,92,246,0.15);color:var(--accent)`;
+    return`<div class="task-card ${task.completed?'completed':''}" data-index="${idx}"><div class="task-check ${task.completed?'checked':''}" data-toggle="${idx}"></div><div class="task-content"><div class="task-title">${escapeHtml(task.title)}</div><div class="task-meta"><span class="task-tag ${tagClass}" ${tagStyle?`style="${tagStyle}"`:''}>
+    ${cat.icon} ${cat.name}</span>${task.time?`<span class="task-time">🕐 ${task.time}</span>`:''}</div></div><div class="task-actions"><button class="task-action-btn task-edit-btn" data-edit="${idx}">✎</button><button class="task-action-btn task-del-btn" data-delete="${idx}">✕</button></div></div>`}).join('');
+    list.querySelectorAll('[data-toggle]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const i=+el.dataset.toggle;state.tasks[state.selectedDate][i].completed=!state.tasks[state.selectedDate][i].completed;saveState();render()}));
+    list.querySelectorAll('[data-delete]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const i=+el.dataset.delete;state.tasks[state.selectedDate].splice(i,1);if(!state.tasks[state.selectedDate].length)delete state.tasks[state.selectedDate];saveState();render()}));
+    list.querySelectorAll('[data-edit]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();openEditTask(+el.dataset.edit)}));
+}
+function renderNotes(){document.getElementById('dayNotes').value=state.notes[state.selectedDate]||''}
 
-    function lockApp() {
-        document.getElementById('appShell').classList.remove('active');
-        localStorage.removeItem(SESSION_KEY);
-        pinAttempts = 0; currentPin = ''; newPinFirst = '';
-        document.getElementById('pinError').textContent = '';
-        document.getElementById('pinKeypad').style.pointerEvents = '';
-        initAuth();
-    }
+// CATEGORY SELECTOR
+function renderCatSelector(){const sel=document.getElementById('tagSelector'),cats=getAllCats();sel.innerHTML=cats.map((c,i)=>`<button class="tag-option ${i===0?'selected':''}" data-tag="${c.id}">${c.icon} ${c.name}</button>`).join('')}
 
-    // PIN keypad
-    document.getElementById('pinKeypad').addEventListener('click', e => {
-        const key = e.target.closest('.pin-key'); if (!key) return;
-        const num = key.dataset.num;
-        if (num === 'back') { currentPin = currentPin.slice(0,-1); document.getElementById('pinError').textContent=''; updatePinDots(); return; }
-        if (num === '' || currentPin.length >= 4) return;
-        currentPin += num; updatePinDots();
-        if (currentPin.length === 4) setTimeout(()=>handlePinComplete(), 200);
-    });
+// TASK MODAL
+const modalOverlay=document.getElementById('modalOverlay'),taskInput=document.getElementById('taskInput'),taskTime=document.getElementById('taskTime');
+let selectedTag='work';
+document.getElementById('fabAdd').addEventListener('click',()=>{editingTaskIdx=-1;document.getElementById('modalTitle').textContent='Nueva tarea';openTaskModal('','','work')});
+function openTaskModal(title,time,tag){modalOverlay.classList.add('active');taskInput.value=title;taskTime.value=time;selectedTag=tag;updateTagSel();setTimeout(()=>taskInput.focus(),300)}
+function openEditTask(idx){const task=state.tasks[state.selectedDate][idx];editingTaskIdx=idx;document.getElementById('modalTitle').textContent='Editar tarea';openTaskModal(task.title,task.time||'',task.tag||'work')}
+document.getElementById('btnCancel').addEventListener('click',()=>modalOverlay.classList.remove('active'));
+modalOverlay.addEventListener('click',e=>{if(e.target===modalOverlay)modalOverlay.classList.remove('active')});
+document.getElementById('tagSelector').addEventListener('click',e=>{const b=e.target.closest('.tag-option');if(b){selectedTag=b.dataset.tag;updateTagSel()}});
+function updateTagSel(){document.querySelectorAll('.tag-option').forEach(b=>b.classList.toggle('selected',b.dataset.tag===selectedTag))}
+document.getElementById('btnSave').addEventListener('click',saveTask);
+taskInput.addEventListener('keydown',e=>{if(e.key==='Enter')saveTask()});
+function saveTask(){const title=taskInput.value.trim();if(!title)return;if(!state.tasks[state.selectedDate])state.tasks[state.selectedDate]=[];if(editingTaskIdx>=0){state.tasks[state.selectedDate][editingTaskIdx].title=title;state.tasks[state.selectedDate][editingTaskIdx].tag=selectedTag;state.tasks[state.selectedDate][editingTaskIdx].time=taskTime.value||''}else{state.tasks[state.selectedDate].push({title,tag:selectedTag,time:taskTime.value||'',completed:false,createdAt:Date.now()})}saveState();modalOverlay.classList.remove('active');editingTaskIdx=-1;render()}
 
-    document.addEventListener('keydown', e => {
-        if (!document.getElementById('lockScreen').classList.contains('hidden') && document.getElementById('pinKeypad').style.display !== 'none') {
-            if (e.key >= '0' && e.key <= '9' && currentPin.length < 4) { currentPin += e.key; updatePinDots(); if (currentPin.length === 4) setTimeout(()=>handlePinComplete(), 200); }
-            else if (e.key === 'Backspace') { currentPin = currentPin.slice(0,-1); updatePinDots(); }
-        }
-    });
+// Notes
+let notesTO;document.getElementById('dayNotes').addEventListener('input',e=>{clearTimeout(notesTO);notesTO=setTimeout(()=>{if(e.target.value.trim())state.notes[state.selectedDate]=e.target.value;else delete state.notes[state.selectedDate];saveState()},500)});
 
-    // Recovery
-    document.getElementById('btnRecoverPin').addEventListener('click', () => {
-        const q = localStorage.getItem(SECURITY_Q_KEY);
-        if (!q) { document.getElementById('pinError').textContent = 'No hay pregunta de seguridad configurada.'; return; }
-        document.getElementById('pinKeypad').style.display = 'none';
-        document.getElementById('pinDisplay').style.display = 'none';
-        document.getElementById('btnRecoverPin').style.display = 'none';
-        document.getElementById('lockTitle').textContent = 'Recuperar PIN';
-        document.getElementById('lockSubtitle').textContent = '';
-        document.getElementById('pinError').textContent = '';
-        const form = document.getElementById('recoveryForm');
-        form.classList.add('active');
-        document.getElementById('recoveryQuestion').textContent = q;
-        form.querySelector('#recoveryAnswer') && (form.querySelector('#recoveryAnswer').value = '');
-    });
+// POMODORO
+const pomoLabels={work:'Trabajo',short:'Descanso',long:'Largo',exercise:'Ejercicio',gaming:'Gaming',custom:'Custom'};
+function loadPomoSettings(){try{const s=localStorage.getItem(POMO_SETTINGS_KEY);if(s)pomoSettings=JSON.parse(s)}catch(e){}['work','short','long','exercise','gaming','custom'].forEach(k=>{const el=document.getElementById('pomo'+k.charAt(0).toUpperCase()+k.slice(1)+'Min');if(el)el.value=pomoSettings[k]||25});pomoState.timeLeft=(pomoSettings[pomoState.mode]||25)*60;renderPomo()}
+function renderPomo(){const total=(pomoSettings[pomoState.mode]||25)*60,left=pomoState.timeLeft;const m=Math.floor(left/60),s=left%60;document.getElementById('pomoTime').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;document.getElementById('pomoLabel').textContent=pomoLabels[pomoState.mode]||'Trabajo';document.getElementById('pomoRing').style.strokeDashoffset=CIRC*(1-left/total);document.getElementById('pomoToggle').textContent=pomoState.running?'⏸':'▶';document.getElementById('pomoCount').textContent=pomoState.completed;const h=Math.floor(pomoState.totalSeconds/3600),mn=Math.floor((pomoState.totalSeconds%3600)/60);document.getElementById('pomoTotal').textContent=`${h}h ${mn}m`}
+function pomoTick(){if(pomoState.timeLeft<=0){pomoComplete();return}pomoState.timeLeft--;if(pomoState.mode==='work'||pomoState.mode==='exercise'||pomoState.mode==='gaming'||pomoState.mode==='custom')pomoState.totalSeconds++;renderPomo()}
+function pomoComplete(){clearInterval(pomoState.interval);pomoState.running=false;if(['work','exercise','gaming','custom'].includes(pomoState.mode))pomoState.completed++;const next=pomoState.mode==='work'?(pomoState.completed%4===0?'long':'short'):'work';setPomoMode(next);try{new Notification('Prismic Pomodoro','🔔 Tiempo terminado!')}catch(e){}renderPomo()}
+function setPomoMode(mode){pomoState.mode=mode;pomoState.timeLeft=(pomoSettings[mode]||25)*60;pomoState.running=false;clearInterval(pomoState.interval);document.querySelectorAll('.pomo-mode').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));renderPomo()}
+document.getElementById('pomoToggle').addEventListener('click',()=>{if(pomoState.running){clearInterval(pomoState.interval);pomoState.running=false}else{pomoState.interval=setInterval(pomoTick,1000);pomoState.running=true}renderPomo()});
+document.getElementById('pomoReset').addEventListener('click',()=>setPomoMode(pomoState.mode));
+document.getElementById('pomoSkip').addEventListener('click',()=>pomoComplete());
+document.querySelectorAll('.pomo-mode').forEach(b=>b.addEventListener('click',()=>setPomoMode(b.dataset.mode)));
 
-    document.getElementById('btnRecoveryCancel')?.addEventListener('click', () => initAuth());
-    document.getElementById('btnRecoverySubmit')?.addEventListener('click', () => {
-        const answer = document.getElementById('recoveryAnswer').value.trim().toLowerCase();
-        const stored = localStorage.getItem(SECURITY_A_KEY);
-        if (answer === stored) { localStorage.removeItem(PIN_HASH_KEY); localStorage.removeItem(SESSION_KEY); initAuth(); }
-        else { document.getElementById('pinError').textContent = 'Respuesta incorrecta.'; }
-    });
+// GYM
+function loadGym(){try{const s=localStorage.getItem(GYM_KEY);if(s)gymData=JSON.parse(s)}catch(e){}}
+function saveGym(){localStorage.setItem(GYM_KEY,JSON.stringify(gymData))}
+function renderGym(){
+    const today=getTodayStr(),exercises=gymData[today]||[],list=document.getElementById('gymList');
+    if(!exercises.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">💪</div><p>No hay ejercicios hoy. ¡Agregá uno!</p></div>';return}
+    list.innerHTML=exercises.map((ex,ei)=>{
+        let setsHtml=ex.sets.map((s,si)=>`<div class="gym-set"><span class="gym-set-num">S${si+1}</span><input class="gym-input" value="${s.reps}" placeholder="Reps" data-ex="${ei}" data-set="${si}" data-field="reps" type="number"><input class="gym-input" value="${s.weight}" placeholder="Kg" data-ex="${ei}" data-set="${si}" data-field="weight"><button class="btn btn-primary" style="padding:6px;font-size:11px" data-rest-start="${ex.rest}">⏱ ${ex.rest}s</button></div>`).join('');
+        return`<div class="gym-exercise"><div class="gym-exercise-header"><span class="gym-exercise-name">${escapeHtml(ex.name)}</span><button class="task-action-btn task-del-btn" data-del-ex="${ei}" style="opacity:1;position:static">✕</button></div><div class="gym-sets">${setsHtml}</div><button class="gym-add-set" data-add-set="${ei}">+ Serie</button></div>`}).join('');
+    list.querySelectorAll('.gym-input').forEach(inp=>inp.addEventListener('change',()=>{const ei=+inp.dataset.ex,si=+inp.dataset.set,f=inp.dataset.field;gymData[today][ei].sets[si][f]=inp.value;saveGym()}));
+    list.querySelectorAll('[data-add-set]').forEach(b=>b.addEventListener('click',()=>{const ei=+b.dataset.addSet;gymData[today][ei].sets.push({reps:'',weight:''});saveGym();renderGym()}));
+    list.querySelectorAll('[data-del-ex]').forEach(b=>b.addEventListener('click',()=>{gymData[today].splice(+b.dataset.delEx,1);saveGym();renderGym()}));
+    list.querySelectorAll('[data-rest-start]').forEach(b=>b.addEventListener('click',()=>startRestTimer(+b.dataset.restStart)));
+}
+// Gym modal
+const gymModal=document.getElementById('gymModal');
+document.getElementById('btnAddExercise').addEventListener('click',()=>{gymModal.classList.add('active');document.getElementById('gymExName').value='';gymRestSeconds=60;document.querySelectorAll('.gym-rest-btn').forEach(b=>b.classList.toggle('active',+b.dataset.rest===60))});
+document.getElementById('btnGymCancel').addEventListener('click',()=>gymModal.classList.remove('active'));
+gymModal.addEventListener('click',e=>{if(e.target===gymModal)gymModal.classList.remove('active')});
+document.querySelectorAll('.gym-rest-btn').forEach(b=>b.addEventListener('click',()=>{gymRestSeconds=+b.dataset.rest;document.querySelectorAll('.gym-rest-btn').forEach(x=>x.classList.toggle('active',+x.dataset.rest===gymRestSeconds))}));
+document.getElementById('btnGymSave').addEventListener('click',()=>{const name=document.getElementById('gymExName').value.trim();if(!name)return;const today=getTodayStr();if(!gymData[today])gymData[today]=[];gymData[today].push({name,rest:gymRestSeconds,sets:[{reps:'',weight:''}]});saveGym();gymModal.classList.remove('active');renderGym()});
 
-    // Lock button
-    document.getElementById('btnLock').addEventListener('click', lockApp);
+// Rest timer
+let restInterval;
+function startRestTimer(secs){const ov=document.getElementById('restTimerOverlay');ov.classList.add('active');let left=secs;document.getElementById('restTimerDisplay').textContent=left;clearInterval(restInterval);restInterval=setInterval(()=>{left--;document.getElementById('restTimerDisplay').textContent=left;if(left<=0){clearInterval(restInterval);ov.classList.remove('active');try{new Notification('Descanso terminado')}catch(e){}}},1000)}
+document.getElementById('btnSkipRest').addEventListener('click',()=>{clearInterval(restInterval);document.getElementById('restTimerOverlay').classList.remove('active')});
 
-    // ==============================
-    // STATE MANAGEMENT
-    // ==============================
-    function loadState() {
-        try { const s = localStorage.getItem(STORAGE_KEY); if (s) { const p = JSON.parse(s); state.tasks = p.tasks||{}; state.notes = p.notes||{}; } } catch(e) {}
-    }
-    function saveState() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ tasks:state.tasks, notes:state.notes }));
-        clearTimeout(syncDebounceTimer);
-        syncDebounceTimer = setTimeout(()=>pushToCloud(), 2000);
-    }
+// SETTINGS
+function loadTheme(){const t=localStorage.getItem(THEME_KEY)||'dark';document.documentElement.setAttribute('data-theme',t==='light'?'light':'');document.getElementById('toggleTheme').classList.toggle('on',t!=='light')}
+document.getElementById('toggleTheme').addEventListener('click',function(){const on=this.classList.toggle('on');localStorage.setItem(THEME_KEY,on?'dark':'light');document.documentElement.setAttribute('data-theme',on?'':'light')});
+document.getElementById('toggleRemember').addEventListener('click',function(){const on=this.classList.toggle('on');localStorage.setItem(REMEMBER_KEY,on?'true':'false');if(on)localStorage.setItem(SESSION_KEY,Date.now().toString());else localStorage.removeItem(SESSION_KEY)});
+if(localStorage.getItem(REMEMBER_KEY)==='true')document.getElementById('toggleRemember').classList.add('on');
+document.getElementById('btnChangePin').addEventListener('click',async()=>{const v=document.getElementById('newPinInput').value;if(v.length!==4||!/^\d{4}$/.test(v)){alert('PIN de 4 dígitos');return}localStorage.setItem(PIN_HASH_KEY,await hashPin(v));document.getElementById('newPinInput').value='';alert('PIN actualizado ✓')});
+document.getElementById('btnSaveQuestion').addEventListener('click',()=>{const q=document.getElementById('securityQuestion').value.trim(),a=document.getElementById('securityAnswer').value.trim().toLowerCase();if(!q||!a){alert('Completá ambos campos');return}localStorage.setItem(SECURITY_Q_KEY,q);localStorage.setItem(SECURITY_A_KEY,a);document.getElementById('securityQuestion').value='';document.getElementById('securityAnswer').value='';alert('Pregunta guardada ✓')});
+document.getElementById('btnSaveSync').addEventListener('click',async()=>{const u=document.getElementById('syncUrlInput').value.trim();setSyncUrl(u);if(u){await pullFromCloud();render();await pushToCloud()}else updateSyncUI('offline','Local')});
+document.getElementById('syncUrlInput').value=getSyncUrl();
+document.querySelectorAll('.pomo-setting').forEach(el=>el.addEventListener('change',()=>{pomoSettings.work=+document.getElementById('pomoWorkMin').value||25;pomoSettings.short=+document.getElementById('pomoShortMin').value||5;pomoSettings.long=+document.getElementById('pomoLongMin').value||15;pomoSettings.exercise=+document.getElementById('pomoExerciseMin').value||45;pomoSettings.gaming=+document.getElementById('pomoGamingMin').value||60;pomoSettings.custom=+document.getElementById('pomoCustomMin').value||30;localStorage.setItem(POMO_SETTINGS_KEY,JSON.stringify(pomoSettings));setPomoMode(pomoState.mode)}));
 
-    // ==============================
-    // CLOUD SYNC
-    // ==============================
-    function getSyncUrl() { return localStorage.getItem(SYNC_URL_KEY)||''; }
-    function setSyncUrl(url) { localStorage.setItem(SYNC_URL_KEY, url); }
-    function updateSyncUI(status, text) {
-        const el = document.getElementById('syncIndicator'); const t = document.getElementById('syncText');
-        el.className = 'sync-badge ' + status; t.textContent = text;
-    }
-    async function pushToCloud() {
-        const url = getSyncUrl(); if (!url) return;
-        updateSyncUI('syncing','Subiendo...');
-        try { await fetch(url, { method:'POST', body:JSON.stringify({tasks:state.tasks,notes:state.notes}), headers:{'Content-Type':'text/plain'} }); updateSyncUI('synced','Sync ✓'); }
-        catch(e) { updateSyncUI('error','Error'); }
-    }
-    async function pullFromCloud() {
-        const url = getSyncUrl(); if (!url) { updateSyncUI('offline','Local'); return; }
-        updateSyncUI('syncing','Bajando...');
-        try {
-            const r = await fetch(url); if (!r.ok) throw 0;
-            const txt = await r.text(); let d;
-            try { d = JSON.parse(txt); } catch(e) { d = JSON.parse(JSON.parse(txt)); }
-            if (d && !d.error) {
-                const mt = {...state.tasks}, mn = {...state.notes};
-                if (d.tasks) for (const [k,v] of Object.entries(d.tasks)) mt[k]=v;
-                if (d.notes) for (const [k,v] of Object.entries(d.notes)) mn[k]=v;
-                state.tasks = mt; state.notes = mn;
-                localStorage.setItem(STORAGE_KEY, JSON.stringify({tasks:state.tasks,notes:state.notes}));
-            }
-            updateSyncUI('synced','Sync ✓');
-        } catch(e) { updateSyncUI('error','Sin conexión'); }
-    }
+// Custom categories
+function renderCustomCatList(){const cats=JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY)||'[]'),el=document.getElementById('customCatList');el.innerHTML=cats.map((c,i)=>`<div class="setting-row"><div class="setting-label">${c.icon} ${c.name}</div><button class="task-action-btn task-del-btn" style="opacity:1;position:static" data-del-cat="${i}">✕</button></div>`).join('');el.querySelectorAll('[data-del-cat]').forEach(b=>b.addEventListener('click',()=>{cats.splice(+b.dataset.delCat,1);localStorage.setItem(CUSTOM_CATS_KEY,JSON.stringify(cats));renderCustomCatList();renderCatSelector()}))}
+document.getElementById('btnAddCat').addEventListener('click',()=>{const icon=document.getElementById('newCatIcon').value.trim(),name=document.getElementById('newCatName').value.trim();if(!icon||!name)return;const cats=JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY)||'[]');const id='custom_'+name.toLowerCase().replace(/\s/g,'_');cats.push({id,icon,name});localStorage.setItem(CUSTOM_CATS_KEY,JSON.stringify(cats));document.getElementById('newCatIcon').value='';document.getElementById('newCatName').value='';renderCustomCatList();renderCatSelector()});
 
-    // ==============================
-    // NAVIGATION
-    // ==============================
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    document.getElementById('btnMenu').addEventListener('click', ()=>{ sidebar.classList.add('open'); overlay.classList.add('active'); });
-    overlay.addEventListener('click', closeSidebar);
-    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); }
-
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const page = item.dataset.page;
-            document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-            item.classList.add('active');
-            document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-            document.getElementById('page'+page.charAt(0).toUpperCase()+page.slice(1)).classList.add('active');
-            document.getElementById('fabAdd').style.display = page==='planner'?'':'none';
-            closeSidebar();
-        });
-    });
-
-    // ==============================
-    // RENDER (PLANNER)
-    // ==============================
-    const DAYS_SHORT = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
-    const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-    function getWeekDates(ref) {
-        const d = new Date(ref+'T12:00:00'), dow = d.getDay(), mon = new Date(d);
-        mon.setDate(d.getDate()-((dow+6)%7));
-        return Array.from({length:7},(_,i)=>{ const x=new Date(mon); x.setDate(mon.getDate()+i); return x.toISOString().split('T')[0]; });
-    }
-    function render() { renderWeekNav(); renderStats(); renderTasks(); renderNotes(); }
-    function renderWeekNav() {
-        const nav=document.getElementById('weekNav'), week=getWeekDates(state.selectedDate), today=getTodayStr();
-        nav.innerHTML = week.map(ds => {
-            const d=new Date(ds+'T12:00:00'), a=ds===state.selectedDate, t=ds===today, h=(state.tasks[ds]||[]).length>0;
-            let c='day-btn'; if(a)c+=' active'; if(t&&!a)c+=' today'; if(h)c+=' has-tasks';
-            return `<button class="${c}" data-date="${ds}"><span>${DAYS_SHORT[d.getDay()]}</span><span class="day-num">${d.getDate()}</span></button>`;
-        }).join('');
-        nav.querySelectorAll('.day-btn').forEach(b=>b.addEventListener('click',()=>{ state.selectedDate=b.dataset.date; render(); }));
-    }
-    function renderStats() {
-        const t=state.tasks[state.selectedDate]||[], total=t.length, done=t.filter(x=>x.completed).length;
-        document.getElementById('statTotal').textContent=total;
-        document.getElementById('statPending').textContent=total-done;
-        document.getElementById('statDone').textContent=done;
-    }
-    function escapeHtml(t) { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
-    function renderTasks() {
-        const list=document.getElementById('taskList'), tasks=state.tasks[state.selectedDate]||[];
-        if (!tasks.length) { list.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>No hay tareas para este día</p></div>'; return; }
-        const sorted=[...tasks].sort((a,b)=>a.completed-b.completed);
-        const tagLabels={work:'💼 Trabajo',personal:'🏠 Personal',study:'📚 Estudio',urgent:'🔥 Urgente'};
-        list.innerHTML = sorted.map(task => {
-            const idx=tasks.indexOf(task);
-            return `<div class="task-card ${task.completed?'completed':''}" data-index="${idx}">
-                <div class="task-check ${task.completed?'checked':''}" data-toggle="${idx}"></div>
-                <div class="task-content"><div class="task-title">${escapeHtml(task.title)}</div><div class="task-meta"><span class="task-tag tag-${task.tag||'work'}">${tagLabels[task.tag]||'💼 Trabajo'}</span>${task.time?`<span class="task-time">🕐 ${task.time}</span>`:''}</div></div>
-                <button class="task-delete" data-delete="${idx}">✕</button></div>`;
-        }).join('');
-        list.querySelectorAll('[data-toggle]').forEach(el=>el.addEventListener('click',e=>{ e.stopPropagation(); const i=+el.dataset.toggle; state.tasks[state.selectedDate][i].completed=!state.tasks[state.selectedDate][i].completed; saveState(); render(); }));
-        list.querySelectorAll('[data-delete]').forEach(el=>el.addEventListener('click',e=>{ e.stopPropagation(); const i=+el.dataset.delete; state.tasks[state.selectedDate].splice(i,1); if(!state.tasks[state.selectedDate].length) delete state.tasks[state.selectedDate]; saveState(); render(); }));
-    }
-    function renderNotes() { document.getElementById('dayNotes').value = state.notes[state.selectedDate]||''; }
-
-    // ==============================
-    // TASK MODAL
-    // ==============================
-    const modalOverlay=document.getElementById('modalOverlay'), taskInput=document.getElementById('taskInput'), taskTime=document.getElementById('taskTime');
-    let selectedTag='work';
-    document.getElementById('fabAdd').addEventListener('click',()=>{ modalOverlay.classList.add('active'); taskInput.value=''; taskTime.value=''; selectedTag='work'; updateTagSel(); setTimeout(()=>taskInput.focus(),300); });
-    document.getElementById('btnCancel').addEventListener('click',()=>modalOverlay.classList.remove('active'));
-    modalOverlay.addEventListener('click',e=>{ if(e.target===modalOverlay) modalOverlay.classList.remove('active'); });
-    document.getElementById('tagSelector').addEventListener('click',e=>{ const b=e.target.closest('.tag-option'); if(b){selectedTag=b.dataset.tag; updateTagSel();} });
-    function updateTagSel() { document.querySelectorAll('.tag-option').forEach(b=>b.classList.toggle('selected',b.dataset.tag===selectedTag)); }
-    document.getElementById('btnSave').addEventListener('click',addTask);
-    taskInput.addEventListener('keydown',e=>{ if(e.key==='Enter') addTask(); });
-    function addTask() {
-        const title=taskInput.value.trim(); if(!title) return;
-        if(!state.tasks[state.selectedDate]) state.tasks[state.selectedDate]=[];
-        state.tasks[state.selectedDate].push({title,tag:selectedTag,time:taskTime.value||'',completed:false,createdAt:Date.now()});
-        saveState(); modalOverlay.classList.remove('active'); render();
-    }
-
-    // Notes auto-save
-    let notesTO;
-    document.getElementById('dayNotes').addEventListener('input',e=>{ clearTimeout(notesTO); notesTO=setTimeout(()=>{ if(e.target.value.trim()) state.notes[state.selectedDate]=e.target.value; else delete state.notes[state.selectedDate]; saveState(); },500); });
-
-    // ==============================
-    // POMODORO
-    // ==============================
-    const durations = { work:()=>pomoSettings.work*60, short:()=>pomoSettings.short*60, long:()=>pomoSettings.long*60 };
-    const labels = { work:'Trabajo', short:'Descanso', long:'Descanso largo' };
-
-    function loadPomoSettings() {
-        try { const s=localStorage.getItem(POMO_SETTINGS_KEY); if(s) pomoSettings=JSON.parse(s); } catch(e){}
-        document.getElementById('pomoWorkMin').value=pomoSettings.work;
-        document.getElementById('pomoShortMin').value=pomoSettings.short;
-        document.getElementById('pomoLongMin').value=pomoSettings.long;
-        pomoState.timeLeft = durations[pomoState.mode]();
-        renderPomo();
-    }
-
-    function renderPomo() {
-        const total = durations[pomoState.mode](), left = pomoState.timeLeft;
-        const mins = Math.floor(left/60), secs = left%60;
-        document.getElementById('pomoTime').textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-        document.getElementById('pomoLabel').textContent = labels[pomoState.mode];
-        const offset = CIRCUMFERENCE * (1 - left/total);
-        document.getElementById('pomoRing').style.strokeDashoffset = offset;
-        document.getElementById('pomoToggle').textContent = pomoState.running ? '⏸' : '▶';
-        document.getElementById('pomoCount').textContent = pomoState.completed;
-        const h=Math.floor(pomoState.totalSeconds/3600), m=Math.floor((pomoState.totalSeconds%3600)/60);
-        document.getElementById('pomoTotal').textContent = `${h}h ${m}m`;
-    }
-
-    function pomoTick() {
-        if (pomoState.timeLeft <= 0) { pomoComplete(); return; }
-        pomoState.timeLeft--;
-        if (pomoState.mode === 'work') pomoState.totalSeconds++;
-        renderPomo();
-    }
-
-    function pomoComplete() {
-        clearInterval(pomoState.interval); pomoState.running = false;
-        if (pomoState.mode === 'work') pomoState.completed++;
-        // Auto-switch
-        if (pomoState.mode === 'work') setPomoMode(pomoState.completed % 4 === 0 ? 'long' : 'short');
-        else setPomoMode('work');
-        try { new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=').play(); } catch(e){}
-        renderPomo();
-    }
-
-    function setPomoMode(mode) {
-        pomoState.mode = mode; pomoState.timeLeft = durations[mode](); pomoState.running = false;
-        clearInterval(pomoState.interval);
-        document.querySelectorAll('.pomo-mode').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
-        renderPomo();
-    }
-
-    document.getElementById('pomoToggle').addEventListener('click', () => {
-        if (pomoState.running) { clearInterval(pomoState.interval); pomoState.running = false; }
-        else { pomoState.interval = setInterval(pomoTick, 1000); pomoState.running = true; }
-        renderPomo();
-    });
-    document.getElementById('pomoReset').addEventListener('click', () => { setPomoMode(pomoState.mode); });
-    document.getElementById('pomoSkip').addEventListener('click', () => { pomoComplete(); });
-    document.querySelectorAll('.pomo-mode').forEach(b=>b.addEventListener('click', ()=>setPomoMode(b.dataset.mode)));
-
-    // ==============================
-    // SETTINGS
-    // ==============================
-    // Theme
-    function loadTheme() {
-        const t = localStorage.getItem(THEME_KEY) || 'dark';
-        document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : '');
-        document.getElementById('toggleTheme').classList.toggle('on', t !== 'light');
-    }
-    document.getElementById('toggleTheme').addEventListener('click', function() {
-        const isOn = this.classList.toggle('on');
-        const theme = isOn ? 'dark' : 'light';
-        localStorage.setItem(THEME_KEY, theme);
-        document.documentElement.setAttribute('data-theme', theme === 'light' ? 'light' : '');
-    });
-
-    // Remember me
-    document.getElementById('toggleRemember').addEventListener('click', function() {
-        const isOn = this.classList.toggle('on');
-        localStorage.setItem(REMEMBER_KEY, isOn ? 'true' : 'false');
-        if (isOn) localStorage.setItem(SESSION_KEY, Date.now().toString());
-        else localStorage.removeItem(SESSION_KEY);
-    });
-    if (localStorage.getItem(REMEMBER_KEY)==='true') document.getElementById('toggleRemember').classList.add('on');
-
-    // Change PIN
-    document.getElementById('btnChangePin').addEventListener('click', async ()=>{
-        const val = document.getElementById('newPinInput').value;
-        if (val.length !== 4 || !/^\d{4}$/.test(val)) { alert('El PIN debe ser de 4 dígitos numéricos'); return; }
-        localStorage.setItem(PIN_HASH_KEY, await hashPin(val));
-        document.getElementById('newPinInput').value = '';
-        alert('PIN actualizado ✓');
-    });
-
-    // Security question
-    document.getElementById('btnSaveQuestion').addEventListener('click', ()=>{
-        const q = document.getElementById('securityQuestion').value.trim();
-        const a = document.getElementById('securityAnswer').value.trim().toLowerCase();
-        if (!q||!a) { alert('Completá ambos campos'); return; }
-        localStorage.setItem(SECURITY_Q_KEY, q); localStorage.setItem(SECURITY_A_KEY, a);
-        document.getElementById('securityQuestion').value=''; document.getElementById('securityAnswer').value='';
-        alert('Pregunta de seguridad guardada ✓');
-    });
-
-    // Sync URL
-    document.getElementById('btnSaveSync').addEventListener('click', async ()=>{
-        const url = document.getElementById('syncUrlInput').value.trim();
-        setSyncUrl(url);
-        if (url) { await pullFromCloud(); render(); await pushToCloud(); }
-        else updateSyncUI('offline','Local');
-    });
-    // Load saved URL
-    document.getElementById('syncUrlInput').value = getSyncUrl();
-
-    // Pomodoro settings save
-    ['pomoWorkMin','pomoShortMin','pomoLongMin'].forEach(id=>{
-        document.getElementById(id).addEventListener('change', ()=>{
-            pomoSettings.work = +document.getElementById('pomoWorkMin').value || 25;
-            pomoSettings.short = +document.getElementById('pomoShortMin').value || 5;
-            pomoSettings.long = +document.getElementById('pomoLongMin').value || 15;
-            localStorage.setItem(POMO_SETTINGS_KEY, JSON.stringify(pomoSettings));
-            setPomoMode(pomoState.mode);
-        });
-    });
-
-    // ==============================
-    // INIT
-    // ==============================
-    initAuth();
-    </script>
+// INIT
+initAuth();
+</script>
 </body>
 </html>
