@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#0a0a0f">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='lg' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%238bcf6'/><stop offset='100%25' stop-color='%2306b6d4'/></linearGradient></defs><path d='M50 15L62 38H74L58 58L65 80L50 65L35 80L42 58L26 38H38Z' fill='url(%23lg)'/></svg>">
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +31,7 @@
         .topbar-left{display:flex;align-items:center;gap:10px}
         .hamburger{background:none;border:none;color:var(--text-primary);font-size:24px;cursor:pointer;padding:4px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius-sm);transition:var(--transition)}
         .hamburger:hover{background:var(--bg-card)}
-        .logo-img{width:32px;height:32px;object-fit:contain;border-radius:6px;}
+        .logo-img{width:28px;height:28px;}
         .topbar-title{font-size:16px;font-weight:700;letter-spacing:-.3px}
         .topbar-title span{color:var(--accent)}
         .topbar-right{display:flex;align-items:center;gap:8px}
@@ -58,7 +59,7 @@
         .sync-badge.syncing .sync-dot{animation:pulse 1s infinite}
 
         /* SIDEBAR INTERNALS */
-        .sidebar-header{padding:0 20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+        .sidebar-header{padding:0 20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
         .sidebar-brand-text{font-size:18px;font-weight:800;letter-spacing:-0.5px}
         .sidebar-brand-text span{color:var(--accent)}
         .sidebar-nav{flex:1;padding:24px 0}
@@ -68,7 +69,7 @@
         .nav-icon{font-size:20px;width:28px;text-align:center}
         .sidebar-footer{padding:20px;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted)}
 
-        /* PLANNER */
+        /* PLANNER & GYM (SHARED) */
         .week-nav{display:flex;gap:6px;padding:6px;background:var(--bg-secondary);border-radius:var(--radius);border:1px solid var(--border);overflow-x:auto;scrollbar-width:none;margin-bottom:24px}
         .day-btn{flex:1;min-width:54px;padding:12px 6px;background:none;border:none;border-radius:var(--radius-sm);color:var(--text-muted);font-family:inherit;font-size:12px;font-weight:700;text-transform:uppercase;cursor:pointer;transition:var(--transition);display:flex;flex-direction:column;align-items:center;gap:6px}
         .day-btn .day-num{font-size:18px;font-weight:800;color:var(--text-secondary)}
@@ -84,6 +85,8 @@
         .stat-pill .stat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:1px;margin-top:4px}
         
         .section-label{font-size:12px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:32px 0 16px}
+        
+        /* PLANNER TASKS */
         .task-list{display:flex;flex-direction:column;gap:12px}
         .task-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;align-items:flex-start;gap:16px;cursor:pointer;transition:var(--transition);position:relative;overflow:hidden;box-shadow:var(--shadow)}
         .task-card:hover{background:var(--bg-card-hover);border-color:var(--border-active);transform:translateY(-2px)}
@@ -139,7 +142,7 @@
         .pomo-mode:hover{color:var(--text-primary)}
         .pomo-mode.active{background:var(--accent);color:white;box-shadow:0 4px 12px var(--accent-glow)}
         
-        /* GYM SECTION OVERHAUL */
+        /* GYM SECTION */
         .gym-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
         .gym-ex-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
         .gym-ex-title{font-size:18px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:8px}
@@ -207,22 +210,54 @@
         .alarm-desc{font-size:16px;color:var(--text-secondary);margin-bottom:40px;line-height:1.5}
         .rest-timer-display{font-size:96px;font-weight:800;color:var(--accent-2);font-variant-numeric:tabular-nums;line-height:1;margin-bottom:16px;text-shadow:0 0 40px rgba(6,182,212,0.3)}
 
-        /* LOCK SCREEN SPECIFIC */
+        /* LOCK SCREEN (V2 STYLE) */
         .lock-screen{position:fixed;inset:0;background:var(--bg-primary);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
         .lock-screen.hidden{display:none}
-        .lock-logo{width:96px;height:96px;margin-bottom:32px;object-fit:contain;border-radius:16px}
-        .pin-keypad{display:grid;grid-template-columns:repeat(3,80px);gap:16px}
-        .pin-key{width:80px;height:64px;font-size:28px}
-        .pin-dot{width:20px;height:20px}
+        .lock-logo{width:80px;height:80px;margin-bottom:24px}
+        .lock-title{font-size:22px;font-weight:700;margin-bottom:8px}
+        .lock-subtitle{color:var(--text-muted);font-size:13px;margin-bottom:32px;text-align:center}
+        .pin-display{display:flex;gap:12px;margin-bottom:32px}
+        .pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--text-muted);transition:var(--transition)}
+        .pin-dot.filled{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
+        .pin-dot.error{border-color:var(--danger);background:var(--danger)}
+        .pin-keypad{display:grid;grid-template-columns:repeat(3,72px);gap:12px}
+        .pin-key{width:72px;height:56px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:22px;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center}
+        .pin-key:active{transform:scale(0.95)}
+        .pin-key.key-back{font-size:16px;color:var(--text-muted)}
+        .pin-error-msg{color:var(--danger);font-size:12px;font-weight:600;margin-top:16px;min-height:18px}
+        .lock-links{margin-top:20px}
+        .lock-link{background:none;border:none;color:var(--text-muted);font-family:inherit;font-size:12px;cursor:pointer;text-decoration:underline}
+        .lock-link:hover{color:var(--accent)}
+        .recovery-form{width:100%;max-width:320px;display:none;margin-top:16px}
+        .recovery-form.active{display:block}
+        .recovery-input{width:100%;padding:12px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:inherit;font-size:14px;margin-bottom:12px}
+        .recovery-input:focus{outline:none;border-color:var(--border-active)}
+        @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+        .shake{animation:shake .4s ease}
     </style>
 </head>
 <body>
 
+<!-- SVG LOGO (NO BACKGROUND) -->
+<svg style="display:none">
+  <defs>
+    <symbol id="prismic-logo" viewBox="0 0 100 100">
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#8b5cf6"/>
+          <stop offset="100%" stop-color="#06b6d4"/>
+        </linearGradient>
+      </defs>
+      <path d="M50 15L62 38H74L58 58L65 80L50 65L35 80L42 58L26 38H38Z" fill="url(#lg)"/>
+    </symbol>
+  </defs>
+</svg>
+
 <!-- LOCK SCREEN -->
 <div class="lock-screen" id="lockScreen">
-    <img src="logo.png" alt="Prismic Logo" class="lock-logo" onerror="this.src='';this.alt='⚡';this.style.background='linear-gradient(135deg,var(--accent),var(--accent-2))';this.style.display='flex';this.style.alignItems='center';this.style.justifyContent='center';this.style.fontSize='48px'">
+    <svg class="lock-logo"><use href="#prismic-logo"/></svg>
     <div class="lock-title" id="lockTitle">Ingresá tu PIN</div>
-    <div class="lock-subtitle" id="lockSubtitle" style="margin-bottom:40px;">4 dígitos para acceder</div>
+    <div class="lock-subtitle" id="lockSubtitle">4 dígitos para acceder</div>
     <div class="pin-display" id="pinDisplay"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div>
     <div class="pin-keypad" id="pinKeypad">
         <button class="pin-key" data-num="1">1</button><button class="pin-key" data-num="2">2</button><button class="pin-key" data-num="3">3</button>
@@ -231,10 +266,10 @@
         <button class="pin-key" data-num="" style="visibility:hidden"></button><button class="pin-key" data-num="0">0</button><button class="pin-key key-back" data-num="back">⌫</button>
     </div>
     <div class="pin-error-msg" id="pinError"></div>
-    <div class="lock-links"><button class="lock-link" id="btnRecoverPin" style="font-size:14px;margin-top:16px;">¿Olvidaste tu PIN?</button></div>
+    <div class="lock-links"><button class="lock-link" id="btnRecoverPin">¿Olvidaste tu PIN?</button></div>
     <div class="recovery-form" id="recoveryForm">
-        <div class="lock-subtitle" style="margin-top:16px">Respondé tu pregunta de seguridad:</div>
-        <div id="recoveryQuestion" style="color:var(--text-primary);font-size:16px;font-weight:700;margin-bottom:24px;text-align:center"></div>
+        <div class="lock-subtitle" style="margin-top:16px; margin-bottom:8px;">Respondé tu pregunta de seguridad:</div>
+        <div id="recoveryQuestion" style="color:var(--text-primary);font-size:16px;font-weight:700;margin-bottom:16px;text-align:center"></div>
         <input class="recovery-input" id="recoveryAnswer" placeholder="Tu respuesta..." autocomplete="off">
         <div class="modal-actions" style="margin-top:16px;"><button class="btn btn-secondary" id="btnRecoveryCancel">Volver</button><button class="btn btn-primary" id="btnRecoverySubmit">Verificar</button></div>
     </div>
@@ -243,19 +278,19 @@
 <!-- APP -->
 <div class="app-shell" id="appShell">
     <div class="topbar">
-        <div class="topbar-left"><button class="hamburger" id="btnMenu">☰</button><img src="logo.png" class="logo-img" alt="⚡" onerror="this.style.display='none'"><div class="topbar-title"><span>Prismic</span> Planner</div></div>
+        <div class="topbar-left"><button class="hamburger" id="btnMenu">☰</button><svg class="logo-img"><use href="#prismic-logo"/></svg><div class="topbar-title"><span>Prismic</span> Planner</div></div>
         <div class="topbar-right"><div class="sync-badge offline" id="syncIndicator"><span class="sync-dot"></span><span id="syncText">Local</span></div><button class="topbar-btn" id="btnLock" title="Bloquear">🔒</button></div>
     </div>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header"><img src="logo.png" class="logo-img" alt="⚡" style="width:40px;height:40px;" onerror="this.style.display='none'"><div class="sidebar-brand-text"><span>Prismic</span> Planner</div></div>
+        <div class="sidebar-header"><svg class="logo-img" style="width:36px;height:36px;"><use href="#prismic-logo"/></svg><div class="sidebar-brand-text"><span>Prismic</span> Planner</div></div>
         <div class="sidebar-nav">
             <div class="nav-item active" data-page="planner"><span class="nav-icon">📋</span>Planner</div>
             <div class="nav-item" data-page="pomodoro"><span class="nav-icon">🍅</span>Pomodoro</div>
             <div class="nav-item" data-page="gym"><span class="nav-icon">💪</span>Gimnasio</div>
             <div class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span>Ajustes</div>
         </div>
-        <div class="sidebar-footer">Prismic v3.0 | Synced & Secure</div>
+        <div class="sidebar-footer">Prismic v3.1 | Synced & Secure</div>
     </nav>
 
     <!-- PLANNER -->
@@ -296,7 +331,11 @@
 
     <!-- GYM OVERHAUL -->
     <div class="page" id="pageGym">
-        <div class="section-label">Rutina de hoy</div>
+        <div class="week-nav" id="gymWeekNav"></div>
+        <div class="stats-row" style="grid-template-columns: 1fr;">
+            <div class="stat-pill"><div class="stat-val" id="gymCal">0</div><div class="stat-label">Kcal Quemadas (Estimado)</div></div>
+        </div>
+        <div class="section-label">Rutina del Día</div>
         <div id="gymList"></div>
         <button class="btn btn-primary" id="btnAddExercise" style="margin-top:24px;width:100%;padding:20px;font-size:18px;">+ Nuevo Ejercicio</button>
     </div>
@@ -343,7 +382,7 @@
 <!-- TASK MODAL -->
 <div class="modal-overlay" id="modalOverlay"><div class="modal"><h2 id="modalTitle">Nueva tarea</h2>
     <div class="input-group"><label>Descripción</label><input class="setting-input" type="text" id="taskInput" placeholder="Organizar servidor, estudiar..." autocomplete="off"></div>
-    <div class="input-group"><label>Horario (Para Notificación Notificación)</label><input class="setting-input" type="time" id="taskTime"></div>
+    <div class="input-group"><label>Horario (Para Notificación)</label><input class="setting-input" type="time" id="taskTime"></div>
     <div class="input-group"><label>Categoría</label><div class="tag-selector" id="tagSelector"></div></div>
     <div class="modal-actions"><button class="btn btn-secondary" id="btnCancel">Cancelar</button><button class="btn btn-primary" id="btnSave">Guardar</button></div>
 </div></div>
@@ -457,9 +496,9 @@ function initAuth(){
     document.getElementById('recoveryForm').classList.remove('active');
     document.getElementById('pinKeypad').style.display='';document.getElementById('pinDisplay').style.display='';document.getElementById('btnRecoverPin').style.display='';
     if(!localStorage.getItem(PIN_HASH_KEY)){
-        isCreatingPin=true;document.getElementById('lockTitle').textContent='Bienvenido a Prismic';document.getElementById('lockSubtitle').textContent='Creá un PIN maestro de 4 dígitos';document.getElementById('btnRecoverPin').style.display='none';
+        isCreatingPin=true;document.getElementById('lockTitle').textContent='Bienvenido a Prismic';document.getElementById('lockSubtitle').textContent='Creá un PIN de 4 dígitos';document.getElementById('btnRecoverPin').style.display='none';
     } else {
-        isCreatingPin=false;document.getElementById('lockTitle').textContent='Ingresar PIN';document.getElementById('lockSubtitle').textContent='Autenticación requerida';
+        isCreatingPin=false;document.getElementById('lockTitle').textContent='Ingresá tu PIN';document.getElementById('lockSubtitle').textContent='4 dígitos para acceder';
     }
     currentPin='';newPinFirst='';updatePinDots();
 }
@@ -468,22 +507,22 @@ function showPinError(m){document.getElementById('pinError').textContent=m;docum
 async function handlePinComplete(){
     if(isCreatingPin){
         if(!newPinFirst){newPinFirst=currentPin;currentPin='';document.getElementById('lockTitle').textContent='Confirmar PIN';document.getElementById('lockSubtitle').textContent='Repetí los 4 dígitos';updatePinDots();}
-        else{if(currentPin===newPinFirst){localStorage.setItem(PIN_HASH_KEY,await hashPin(currentPin));showSecuritySetup()}else{newPinFirst='';document.getElementById('lockTitle').textContent='PIN Error';document.getElementById('lockSubtitle').textContent='No coinciden. Creá uno nuevo.';showPinError('Reintentar.')}}
+        else{if(currentPin===newPinFirst){localStorage.setItem(PIN_HASH_KEY,await hashPin(currentPin));showSecuritySetup()}else{newPinFirst='';document.getElementById('lockTitle').textContent='PIN Error';document.getElementById('lockSubtitle').textContent='Crealo otra vez.';showPinError('No coincide')}}
     }else{
         if(await hashPin(currentPin)===localStorage.getItem(PIN_HASH_KEY)){pinAttempts=0;unlockApp()}
-        else{pinAttempts++;const r=MAX_ATTEMPTS-pinAttempts;if(r<=0){showPinError('Bloqueado. Recargar.');document.getElementById('pinKeypad').style.pointerEvents='none'}else showPinError(`PIN erróneo. ${r} intentos.`)}
+        else{pinAttempts++;const r=MAX_ATTEMPTS-pinAttempts;if(r<=0){showPinError('Bloqueado. Recargar.');document.getElementById('pinKeypad').style.pointerEvents='none'}else showPinError(`Incorrecto. ${r} intentos.`)}
     }
 }
-function showSecuritySetup(){document.getElementById('pinKeypad').style.display='none';document.getElementById('pinDisplay').style.display='none';document.getElementById('lockTitle').textContent='Seguridad Extra';document.getElementById('lockSubtitle').textContent='Fundamental si olvidás tu PIN';const f=document.getElementById('recoveryForm');f.classList.add('active');f.innerHTML='<input class="recovery-input" id="setupQuestion" placeholder="¿Pregunta? (Ej: Color favorito)"><input class="recovery-input" id="setupAnswer" placeholder="Respuesta secreta"><div class="modal-actions"><button class="btn btn-secondary" onclick="unlockApp()">Ignorar Riego</button><button class="btn btn-primary" onclick="saveSecurity()">Aplicar Seguridad</button></div>'}
+function showSecuritySetup(){document.getElementById('pinKeypad').style.display='none';document.getElementById('pinDisplay').style.display='none';document.getElementById('btnRecoverPin').style.display='none';document.getElementById('lockTitle').textContent='Pregunta de Rescate';document.getElementById('lockSubtitle').textContent='Úsala solo si te olvidás la contraseña';const f=document.getElementById('recoveryForm');f.classList.add('active');f.innerHTML='<input class="recovery-input" id="setupQuestion" placeholder="¿Pregunta? (Ej: Mascota)"><input class="recovery-input" id="setupAnswer" placeholder="Respuesta de recuperación"><div class="modal-actions"><button class="btn btn-secondary" onclick="unlockApp()">Omitir</button><button class="btn btn-primary" onclick="saveSecurity()">Aplicar</button></div>'}
 function saveSecurity(){const q=document.getElementById('setupQuestion').value.trim(),a=document.getElementById('setupAnswer').value.trim().toLowerCase();if(q&&a){localStorage.setItem(SECURITY_Q_KEY,q);localStorage.setItem(SECURITY_A_KEY,a)}unlockApp()}
 async function unlockApp(){document.getElementById('lockScreen').classList.add('hidden');document.getElementById('appShell').classList.add('active');if(localStorage.getItem(REMEMBER_KEY)==='true')localStorage.setItem(SESSION_KEY,Date.now().toString());loadLocalState();loadPomoSettings();loadTheme();renderCatSelector();render();renderCustomCatList();renderGym();startBackgroundTasks();await pullFromCloud();render();renderGym()}
 function lockApp(){document.getElementById('appShell').classList.remove('active');localStorage.removeItem(SESSION_KEY);pinAttempts=0;currentPin='';initAuth()}
 
 document.getElementById('pinKeypad').addEventListener('click',e=>{const k=e.target.closest('.pin-key');if(!k)return;const n=k.dataset.num;if(n==='back'){currentPin=currentPin.slice(0,-1);document.getElementById('pinError').textContent='';updatePinDots();return}if(n===''||currentPin.length>=4)return;currentPin+=n;updatePinDots();if(currentPin.length===4)setTimeout(handlePinComplete,150)});
 document.addEventListener('keydown',e=>{if(!document.getElementById('lockScreen').classList.contains('hidden')&&document.getElementById('pinKeypad').style.display!=='none'){if(e.key>='0'&&e.key<='9'&&currentPin.length<4){currentPin+=e.key;updatePinDots();if(currentPin.length===4)setTimeout(handlePinComplete,150)}else if(e.key==='Backspace'){currentPin=currentPin.slice(0,-1);updatePinDots()}}});
-document.getElementById('btnRecoverPin').addEventListener('click',()=>{const q=localStorage.getItem(SECURITY_Q_KEY);if(!q){document.getElementById('pinError').textContent='Sin método rescate.';return}document.getElementById('pinKeypad').style.display='none';document.getElementById('pinDisplay').style.display='none';document.getElementById('btnRecoverPin').style.display='none';document.getElementById('lockTitle').textContent='Recuperación';document.getElementById('lockSubtitle').textContent='';document.getElementById('pinError').textContent='';const f=document.getElementById('recoveryForm');f.classList.add('active');document.getElementById('recoveryQuestion').textContent=q;const ans=f.querySelector('#recoveryAnswer');if(ans)ans.value=''});
+document.getElementById('btnRecoverPin').addEventListener('click',()=>{const q=localStorage.getItem(SECURITY_Q_KEY);if(!q){document.getElementById('pinError').textContent='No hay pregunta de rescate.';return}document.getElementById('pinKeypad').style.display='none';document.getElementById('pinDisplay').style.display='none';document.getElementById('btnRecoverPin').style.display='none';document.getElementById('lockTitle').textContent='Recuperación';document.getElementById('lockSubtitle').textContent='';document.getElementById('pinError').textContent='';const f=document.getElementById('recoveryForm');f.classList.add('active');document.getElementById('recoveryQuestion').textContent=q;const ans=f.querySelector('#recoveryAnswer');if(ans)ans.value=''});
 document.getElementById('btnRecoveryCancel')?.addEventListener('click',()=>initAuth());
-document.getElementById('btnRecoverySubmit')?.addEventListener('click',()=>{const a=document.getElementById('recoveryAnswer').value.trim().toLowerCase();if(a===localStorage.getItem(SECURITY_A_KEY)){localStorage.removeItem(PIN_HASH_KEY);localStorage.removeItem(SESSION_KEY);initAuth()}else document.getElementById('pinError').textContent='Identidad no verificada.'});
+document.getElementById('btnRecoverySubmit')?.addEventListener('click',()=>{const a=document.getElementById('recoveryAnswer').value.trim().toLowerCase();if(a===localStorage.getItem(SECURITY_A_KEY)){localStorage.removeItem(PIN_HASH_KEY);localStorage.removeItem(SESSION_KEY);initAuth()}else document.getElementById('pinError').textContent='Respuesta incorrecta.'});
 document.getElementById('btnLock').addEventListener('click',lockApp);
 
 function loadLocalState(){try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.tasks=p.tasks||{};state.notes=p.notes||{}}const g=localStorage.getItem(GYM_KEY);if(g)gymData=JSON.parse(g)}catch(e){}}
@@ -522,10 +561,26 @@ document.querySelectorAll('.nav-item').forEach(item=>{item.addEventListener('cli
 // ============================================
 const DAYS_SHORT=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
 function getWeekDates(ref){const d=new Date(ref+'T12:00:00'),dow=d.getDay(),mon=new Date(d);mon.setDate(d.getDate()-((dow+6)%7));return Array.from({length:7},(_,i)=>{const x=new Date(mon);x.setDate(mon.getDate()+i);return x.toISOString().split('T')[0]})}
+
+function generateWeekNavHTML(week, today, selectedDate, checkHasDataCallback) {
+    return week.map(ds=>{
+        const d=new Date(ds+'T12:00:00'),a=ds===selectedDate,t=ds===today,h=checkHasDataCallback(ds);
+        let c='day-btn';if(a)c+=' active';if(t&&!a)c+=' today';if(h)c+=' has-tasks';
+        return`<button class="${c}" data-date="${ds}"><span>${DAYS_SHORT[d.getDay()]}</span><span class="day-num">${d.getDate()}</span></button>`
+    }).join('');
+}
+
+function bindWeekNavEvents(containerId, updateFunc) {
+    document.getElementById(containerId).querySelectorAll('.day-btn').forEach(b=>b.addEventListener('click',()=>{
+        state.selectedDate=b.dataset.date;
+        render(); renderGym();
+    }));
+}
+
 function render(){
-    const nav=document.getElementById('weekNav'),week=getWeekDates(state.selectedDate),today=getTodayStr();
-    nav.innerHTML=week.map(ds=>{const d=new Date(ds+'T12:00:00'),a=ds===state.selectedDate,t=ds===today,h=(state.tasks[ds]||[]).length>0;let c='day-btn';if(a)c+=' active';if(t&&!a)c+=' today';if(h)c+=' has-tasks';return`<button class="${c}" data-date="${ds}"><span>${DAYS_SHORT[d.getDay()]}</span><span class="day-num">${d.getDate()}</span></button>`}).join('');
-    nav.querySelectorAll('.day-btn').forEach(b=>b.addEventListener('click',()=>{state.selectedDate=b.dataset.date;render()}));
+    const week=getWeekDates(state.selectedDate), today=getTodayStr();
+    document.getElementById('weekNav').innerHTML = generateWeekNavHTML(week, today, state.selectedDate, (ds) => (state.tasks[ds]||[]).length>0);
+    bindWeekNavEvents('weekNav', render);
     
     const t=state.tasks[state.selectedDate]||[],total=t.length,done=t.filter(x=>x.completed).length;
     document.getElementById('statTotal').textContent=total;document.getElementById('statPending').textContent=total-done;document.getElementById('statDone').textContent=done;
@@ -612,21 +667,30 @@ document.getElementById('btnSavePomoEdit').addEventListener('click',()=>{
 // GYM OVERHAUL 
 // ============================================
 function renderGym(){
-    const tds=getTodayStr(), exes=gymData[tds]||[], lst=document.getElementById('gymList');
+    const week=getWeekDates(state.selectedDate), today=getTodayStr();
+    document.getElementById('gymWeekNav').innerHTML = generateWeekNavHTML(week, today, state.selectedDate, (ds) => (gymData[ds]||[]).length>0);
+    bindWeekNavEvents('gymWeekNav', renderGym);
+
+    const tds=state.selectedDate, exes=gymData[tds]||[], lst=document.getElementById('gymList');
+    
+    // Calcula calorías estimadas (15 kcal por serie completada)
+    let cals=0;
+    exes.forEach(ex => cals += (ex.sets.length * 15));
+    document.getElementById('gymCal').textContent=cals;
+
     if(!exes.length){lst.innerHTML='<div class="empty-state"><div class="empty-icon">🏋️</div><p>Sin entrenamiento registrado hoy.</p></div>';return;}
     lst.innerHTML=exes.map((ex,ei)=>{
-        const setsH=ex.sets.map((s,si)=>`<div class="gym-set-row"><div class="gym-set-num">S${si+1}</div><div class="gym-input-wrapper"><span class="gym-input-icon">KG</span><input class="gym-input" data-ex="${ei}" data-set="${si}" data-fd="weight" value="${s.weight}" type="number"></div><div class="gym-input-wrapper"><span class="gym-input-icon">REPS</span><input class="gym-input" data-ex="${ei}" data-set="${si}" data-fd="reps" value="${s.reps}" type="number"></div><button class="gym-set-del" data-del-set="${ei}-${si}">✕</button></div>`).join('');
+        const setsH=ex.sets.map((s,si)=>`<div class="gym-set-row"><div class="gym-set-num">S${si+1}</div><div class="gym-input-wrapper"><span class="gym-input-icon">KG</span><input class="gym-input" data-ex="${ei}" data-set="${si}" data-fd="weight" value="${escapeHtml(s.weight)}" type="number"></div><div class="gym-input-wrapper"><span class="gym-input-icon">REPS</span><input class="gym-input" data-ex="${ei}" data-set="${si}" data-fd="reps" value="${escapeHtml(s.reps)}" type="number"></div><button class="gym-set-del" data-del-set="${ei}-${si}">✕</button></div>`).join('');
         return `<div class="gym-card"><div class="gym-ex-header"><div class="gym-ex-title"><span>💪</span>${escapeHtml(ex.name)}</div><button class="task-action-btn task-del-btn" style="position:static;opacity:1" data-del-ex="${ei}">✕</button></div><div class="gym-sets">${setsH}</div>
         <div class="gym-actions"><button class="gym-action-btn gym-btn-add" data-add-set="${ei}">+ Nueva Serie</button></div>
         <div class="gym-rest-controls"><button class="rest-opt" data-rest="60">60s</button><button class="rest-opt" data-rest="90">90s</button><button class="rest-opt" data-rest="120">120s</button><button class="gym-action-btn gym-btn-rest" data-start-rest="${ei}">Iniciar Descanso</button></div></div>`;
     }).join('');
     
-    lst.querySelectorAll('.gym-input').forEach(inp=>inp.addEventListener('change',()=>{const ei=+inp.dataset.ex,si=+inp.dataset.set,fd=inp.dataset.fd; gymData[tds][ei].sets[si][fd]=inp.value;saveLocalState()}));
+    lst.querySelectorAll('.gym-input').forEach(inp=>inp.addEventListener('change',()=>{const ei=+inp.dataset.ex,si=+inp.dataset.set,fd=inp.dataset.fd; gymData[tds][ei].sets[si][fd]=inp.value;saveLocalState();renderGym()}));
     lst.querySelectorAll('[data-add-set]').forEach(b=>b.addEventListener('click',()=>{gymData[tds][+b.dataset.addSet].sets.push({reps:'',weight:''});saveLocalState();renderGym()}));
     lst.querySelectorAll('[data-del-set]').forEach(b=>{b.addEventListener('click',()=>{const[ei,si]=b.dataset.delSet.split('-');gymData[tds][ei].sets.splice(+si,1);saveLocalState();renderGym()})});
     lst.querySelectorAll('[data-del-ex]').forEach(b=>{b.addEventListener('click',()=>{gymData[tds].splice(+b.dataset.delEx,1);saveLocalState();renderGym()})});
     
-    // Config logic for rest buttons inside cards
     lst.querySelectorAll('.rest-opt').forEach(b=>{
         b.addEventListener('click', e=>{
             const c=e.target.parentElement; c.querySelectorAll('.rest-opt').forEach(x=>x.classList.remove('active')); e.target.classList.add('active');
@@ -634,7 +698,7 @@ function renderGym(){
         })
     });
     lst.querySelectorAll('.gym-btn-rest').forEach(b=>{
-        if(!b.dataset.restVal) b.dataset.restVal='60'; // default
+        if(!b.dataset.restVal) b.dataset.restVal='60';
         b.parentElement.querySelector(`[data-rest="${b.dataset.restVal}"]`).classList.add('active');
         b.addEventListener('click', ()=>startRestTimer(+b.dataset.restVal));
     });
@@ -644,7 +708,7 @@ document.getElementById('btnAddExercise').addEventListener('click',()=>{gModal.c
 document.getElementById('btnGymCancel').addEventListener('click',()=>gModal.classList.remove('active'));
 document.getElementById('btnGymSave').addEventListener('click',()=>{
     const name=document.getElementById('gymExName').value.trim(); if(!name)return;
-    const t=getTodayStr(); if(!gymData[t])gymData[t]=[]; gymData[t].push({name,sets:[{reps:'',weight:''}]});
+    const t=state.selectedDate; if(!gymData[t])gymData[t]=[]; gymData[t].push({name,sets:[{reps:'',weight:''}]});
     saveLocalState(); gModal.classList.remove('active'); renderGym();
 });
 
