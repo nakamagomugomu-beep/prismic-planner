@@ -352,6 +352,14 @@
                 <tbody></tbody>
             </table>
         </div>
+        
+        <div class="section-label">Resumen Semanal (Base: 112h despierto)</div>
+        <div class="table-responsive">
+            <table class="schedule-table" id="schStatsTable">
+                <thead><tr><th style="text-align:left">Actividad</th><th>Horas/semana</th><th>% del tiempo despierto</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <!-- POMODORO -->
@@ -748,6 +756,7 @@ function renderSchedule() {
         weTbody.appendChild(trWe);
     });
     updateCurrentActivity();
+    renderScheduleStats();
 }
 
 function updateCurrentActivity() {
@@ -780,6 +789,49 @@ function updateCurrentActivity() {
         document.getElementById('schCurrentName').textContent = 'Tiempo Libre / Descanso';
         container.classList.remove('active-border');
     }
+}
+
+function renderScheduleStats() {
+    const TOTAL_AWAKE = 112; 
+    const stats = {};
+    
+    userSchedule.forEach(slot => {
+        const [sh, sm] = slot.start.split(':').map(Number);
+        const [eh, em] = slot.end.split(':').map(Number);
+        const durationHours = ((eh * 60 + em) - (sh * 60 + sm)) / 60;
+        
+        for (let i = 0; i < 7; i++) {
+            const act = slot.days[i];
+            if (act && act !== '-') {
+                if(!stats[act]) stats[act] = 0;
+                stats[act] += durationHours;
+            }
+        }
+    });
+
+    let mappedHours = 0;
+    let statsArray = [];
+    for (const [act, hrs] of Object.entries(stats)) {
+        mappedHours += hrs;
+        statsArray.push({ act, hrs });
+    }
+    
+    let freeTime = TOTAL_AWAKE - mappedHours;
+    if (freeTime < 0) freeTime = 0;
+    statsArray.push({ act: 'Tiempo libre (-)', hrs: freeTime });
+    
+    statsArray.sort((a,b) => b.hrs - a.hrs);
+
+    const tbody = document.querySelector('#schStatsTable tbody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    statsArray.forEach(item => {
+        const pct = ((item.hrs / TOTAL_AWAKE) * 100).toFixed(2);
+        const colorClass = getSchColor(item.act); 
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="${colorClass}" style="text-align:left; font-weight:700;">${escapeHtml(item.act)}</td><td>${item.hrs % 1 === 0 ? item.hrs : item.hrs.toFixed(2)} h</td><td>${pct}%</td>`;
+        tbody.appendChild(tr);
+    });
 }
 
 
