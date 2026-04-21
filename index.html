@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#0a0a0f">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='lg' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%238bcf6'/><stop offset='100%25' stop-color='%2306b6d4'/></linearGradient></defs><path d='M50 15L62 38H74L58 58L65 80L50 65L35 80L42 58L26 38H38Z' fill='url(%23lg)'/></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><defs><linearGradient id='lg' x1='0' y1='0' x2='1' y2='1'><stop offset='0%25' stop-color='%238b5cf6'/><stop offset='100%25' stop-color='%2306b6d4'/></linearGradient></defs><path d='M50 15L62 38H74L58 58L65 80L50 65L35 80L42 58L26 38H38Z' fill='url(%23lg)'/></svg>">
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -167,6 +167,32 @@
         .rest-opt{flex:1;padding:8px 4px;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-muted);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:var(--transition)}
         .rest-opt.active{background:rgba(6,182,212,0.15);border-color:var(--accent-2);color:var(--accent-2)}
 
+        /* SCHEDULE PAGE */
+        .schedule-current{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;box-shadow:var(--shadow);margin-bottom:32px;position:relative;overflow:hidden;transition:var(--transition)}
+        .schedule-current.active-border{border-color:var(--accent);box-shadow:0 8px 32px var(--accent-glow)}
+        .schedule-current::before{content:'';position:absolute;top:0;left:0;width:100%;height:4px;background:var(--border)}
+        .schedule-current.active-border::before{background:var(--accent)}
+        .sch-current-label{font-size:12px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+        .sch-current-time{font-size:18px;color:var(--text-secondary);font-weight:600;margin-bottom:4px}
+        .sch-current-name{font-size:28px;font-weight:800;color:var(--text-primary);line-height:1.2}
+        .schedule-current.active-border .sch-current-name{color:var(--accent)}
+        
+        .table-responsive{width:100%;overflow-x:auto;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:32px;scrollbar-width:thin;}
+        .table-responsive::-webkit-scrollbar{height:8px}
+        .table-responsive::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+        .schedule-table{width:100%;border-collapse:collapse;min-width:600px;text-align:center;font-size:13px;line-height:1.4}
+        .schedule-table th{background:var(--bg-secondary);padding:14px 10px;font-weight:700;color:var(--text-primary);border-bottom:1px solid var(--border);border-right:1px solid var(--border);white-space:nowrap}
+        .schedule-table td{padding:14px 10px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);font-weight:600;color:var(--text-secondary);vertical-align:middle;}
+        .schedule-table th:last-child, .schedule-table td:last-child{border-right:none}
+        .schedule-table tbody tr:last-child td{border-bottom:none}
+        .schedule-table td.sch-blue{background:rgba(96,165,250,0.1);color:#60a5fa}
+        .schedule-table td.sch-purple{background:rgba(167,139,250,0.1);color:#a78bfa}
+        .schedule-table td.sch-green{background:rgba(52,211,153,0.1);color:#34d399}
+        .schedule-table td.sch-orange{background:rgba(251,146,60,0.1);color:#fb923c}
+        .schedule-table td.sch-yellow{background:rgba(250,204,21,0.1);color:#facc15}
+        .schedule-table td.sch-gray{color:var(--text-muted)}
+        .schedule-table td.sch-active{border:2px solid var(--accent);box-shadow:inset 0 0 10px var(--accent-glow);position:relative;z-index:10}
+
         /* SETTINGS */
         .setting-group{margin-bottom:32px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
         .setting-group h3{font-size:14px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:20px;display:flex;align-items:center;gap:8px}
@@ -286,11 +312,12 @@
         <div class="sidebar-header"><svg class="logo-img" style="width:36px;height:36px;"><use href="#prismic-logo"/></svg><div class="sidebar-brand-text"><span>Prismic</span> Planner</div></div>
         <div class="sidebar-nav">
             <div class="nav-item active" data-page="planner"><span class="nav-icon">📋</span>Planner</div>
+            <div class="nav-item" data-page="schedule"><span class="nav-icon">📅</span>Horarios</div>
             <div class="nav-item" data-page="pomodoro"><span class="nav-icon">🍅</span>Pomodoro</div>
             <div class="nav-item" data-page="gym"><span class="nav-icon">💪</span>Gimnasio</div>
             <div class="nav-item" data-page="settings"><span class="nav-icon">⚙️</span>Ajustes</div>
         </div>
-        <div class="sidebar-footer">Prismic v3.1 | Synced & Secure</div>
+        <div class="sidebar-footer">Prismic v3.2 | Synced & Secure</div>
     </nav>
 
     <!-- PLANNER -->
@@ -300,6 +327,31 @@
         <div class="section-label">Tareas del día</div>
         <div class="task-list" id="taskList"></div>
         <div style="margin-top:32px"><div class="section-label">Notas del día</div><textarea class="notes-textarea" id="dayNotes" placeholder="Escribí lo que necesites recordar hoy..."></textarea></div>
+    </div>
+
+    <!-- SCHEDULE -->
+    <div class="page" id="pageSchedule" style="max-width: 900px;">
+        <div class="schedule-current" id="schCurrentContainer">
+            <div class="sch-current-label">Actividad Actual</div>
+            <div class="sch-current-time" id="schCurrentTime">--:--</div>
+            <div class="sch-current-name" id="schCurrentName">Validando...</div>
+        </div>
+        
+        <div class="section-label">Lunes a Viernes</div>
+        <div class="table-responsive">
+            <table class="schedule-table" id="schWeekTable">
+                <thead><tr><th>Hora / Día</th><th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="section-label">Fin de Semana</div>
+        <div class="table-responsive">
+            <table class="schedule-table" id="schWeekendTable">
+                <thead><tr><th>Hora / Día</th><th>Sáb</th><th>Dom</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <!-- POMODORO -->
@@ -431,7 +483,23 @@ let pomoState={mode:'work',running:false,timeLeft:25*60,targetTime:0,interval:nu
 let pomoSettings={work:25,short:5,long:15,exercise:45,gaming:60,custom:30};
 let gymData={};
 
-// Audio Synthesizer (Built-in alarm avoiding external files)
+// ============================================
+// HORARIOS / SCHEDULE DATA
+// Modificable fácilmente aquí a futuro
+// ============================================
+const userSchedule = [
+    { time:"07:00 - 07:45", start:"07:00", end:"07:45", days:{ 1:"Inglés", 2:"PCG/Data Layers", 3:"Inglés", 4:"PCG/Data Layers", 5:"Inglés", 6:"-", 0:"-" } },
+    { time:"08:00 - 12:00", start:"08:00", end:"12:00", days:{ 1:"Trabajo", 2:"Trabajo", 3:"Trabajo", 4:"Trabajo", 5:"Trabajo", 6:"Trabajo", 0:"Limpiar" } },
+    { time:"12:00 - 13:15", start:"12:00", end:"13:15", days:{ 1:"-", 2:"-", 3:"-", 4:"-", 5:"-", 6:"Blender", 0:"-" } },
+    { time:"13:15 - 14:00", start:"13:15", end:"14:00", days:{ 1:"Almuerzo", 2:"Almuerzo", 3:"Almuerzo", 4:"Almuerzo", 5:"Almuerzo", 6:"Almuerzo", 0:"Almuerzo" } },
+    { time:"14:00 - 18:15", start:"14:00", end:"18:15", days:{ 1:"Trabajo", 2:"Trabajo", 3:"Trabajo", 4:"Trabajo", 5:"Trabajo", 6:"-", 0:"Portfolio Sprint (1h) + 2h libres" } },
+    { time:"18:15 - 19:00", start:"18:15", end:"19:00", days:{ 1:"LD", 2:"-", 3:"Game Analysis (30 min)", 4:"-", 5:"LD", 6:"Proyecto propio", 0:"-" } },
+    { time:"19:00 - 20:00", start:"19:00", end:"20:00", days:{ 1:"-", 2:"-", 3:"-", 4:"-", 5:"-", 6:"-", 0:"-" } },
+    { time:"20:00 - 22:00", start:"20:00", end:"22:00", days:{ 1:"-", 2:"Kick Boxing", 3:"Shaders", 4:"Kick Boxing", 5:"Kick Boxing", 6:"-", 0:"-" } },
+    { time:"22:30 - 23:30", start:"22:30", end:"23:30", days:{ 1:"Jugar", 2:"Jugar", 3:"Jugar", 4:"Jugar", 5:"Jugar", 6:"Jugar", 0:"-" } }
+];
+
+// Audio Synthesizer
 let alarmInterval=null;
 function startAudioAlarm(title,desc) {
     document.getElementById('alarmOverlay').style.display='flex';
@@ -515,7 +583,15 @@ async function handlePinComplete(){
 }
 function showSecuritySetup(){document.getElementById('pinKeypad').style.display='none';document.getElementById('pinDisplay').style.display='none';document.getElementById('btnRecoverPin').style.display='none';document.getElementById('lockTitle').textContent='Pregunta de Rescate';document.getElementById('lockSubtitle').textContent='Úsala solo si te olvidás la contraseña';const f=document.getElementById('recoveryForm');f.classList.add('active');f.innerHTML='<input class="recovery-input" id="setupQuestion" placeholder="¿Pregunta? (Ej: Mascota)"><input class="recovery-input" id="setupAnswer" placeholder="Respuesta de recuperación"><div class="modal-actions"><button class="btn btn-secondary" onclick="unlockApp()">Omitir</button><button class="btn btn-primary" onclick="saveSecurity()">Aplicar</button></div>'}
 function saveSecurity(){const q=document.getElementById('setupQuestion').value.trim(),a=document.getElementById('setupAnswer').value.trim().toLowerCase();if(q&&a){localStorage.setItem(SECURITY_Q_KEY,q);localStorage.setItem(SECURITY_A_KEY,a)}unlockApp()}
-async function unlockApp(){document.getElementById('lockScreen').classList.add('hidden');document.getElementById('appShell').classList.add('active');if(localStorage.getItem(REMEMBER_KEY)==='true')localStorage.setItem(SESSION_KEY,Date.now().toString());loadLocalState();loadPomoSettings();loadTheme();renderCatSelector();render();renderCustomCatList();renderGym();startBackgroundTasks();await pullFromCloud();render();renderGym()}
+async function unlockApp(){
+    document.getElementById('lockScreen').classList.add('hidden');
+    document.getElementById('appShell').classList.add('active');
+    if(localStorage.getItem(REMEMBER_KEY)==='true')localStorage.setItem(SESSION_KEY,Date.now().toString());
+    loadLocalState(); loadPomoSettings(); loadTheme(); renderCatSelector(); 
+    render(); renderGym(); renderSchedule();
+    startBackgroundTasks(); await pullFromCloud();
+    render(); renderGym();
+}
 function lockApp(){document.getElementById('appShell').classList.remove('active');localStorage.removeItem(SESSION_KEY);pinAttempts=0;currentPin='';initAuth()}
 
 document.getElementById('pinKeypad').addEventListener('click',e=>{const k=e.target.closest('.pin-key');if(!k)return;const n=k.dataset.num;if(n==='back'){currentPin=currentPin.slice(0,-1);document.getElementById('pinError').textContent='';updatePinDots();return}if(n===''||currentPin.length>=4)return;currentPin+=n;updatePinDots();if(currentPin.length===4)setTimeout(handlePinComplete,150)});
@@ -533,6 +609,7 @@ function saveLocalState(){localStorage.setItem(STORAGE_KEY,JSON.stringify({tasks
 // ============================================
 function startBackgroundTasks() {
     setInterval(() => {
+        // Tareas programadas
         const now = new Date();
         const str = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
         const tasks = state.tasks[getTodayStr()] || [];
@@ -544,7 +621,10 @@ function startBackgroundTasks() {
             }
         });
         if(modified) saveLocalState();
-    }, 30000);
+        
+        // Actualizar actividad del horario
+        updateCurrentActivity();
+    }, 30000); // Chequea cada 30 segundos
 }
 
 // ============================================
@@ -554,7 +634,19 @@ const sidebar=document.getElementById('sidebar'),sOverlay=document.getElementByI
 document.getElementById('btnMenu').addEventListener('click',()=>{sidebar.classList.add('open');sOverlay.classList.add('active')});
 sOverlay.addEventListener('click',closeSidebar);
 function closeSidebar(){sidebar.classList.remove('open');sOverlay.classList.remove('active')}
-document.querySelectorAll('.nav-item').forEach(item=>{item.addEventListener('click',()=>{const pg=item.dataset.page;document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));item.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page'+pg.charAt(0).toUpperCase()+pg.slice(1)).classList.add('active');document.getElementById('fabAdd').style.display=pg==='planner'?'flex':'none';closeSidebar();if(pg==='gym')renderGym();})});
+document.querySelectorAll('.nav-item').forEach(item=>{
+    item.addEventListener('click',()=>{
+        const pg=item.dataset.page;
+        document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+        item.classList.add('active');
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById('page'+pg.charAt(0).toUpperCase()+pg.slice(1)).classList.add('active');
+        document.getElementById('fabAdd').style.display=pg==='planner'?'flex':'none';
+        closeSidebar();
+        if(pg==='gym') renderGym();
+        if(pg==='schedule') renderSchedule();
+    });
+});
 
 // ============================================
 // PLANNER VER 3.0
@@ -604,7 +696,7 @@ function render(){
     }
     document.getElementById('dayNotes').value=state.notes[state.selectedDate]||'';
 }
-function escapeHtml(t){const n=document.createElement('div');n.textContent=t;return n.innerHTML}
+function escapeHtml(t){if(!t)return ''; const n=document.createElement('div');n.textContent=t;return n.innerHTML}
 
 function renderCatSelector(){document.getElementById('tagSelector').innerHTML=getAllCats().map((c,i)=>`<button class="tag-option ${i===0?'selected':''}" data-tag="${c.id}">${c.icon} ${c.name}</button>`).join('')}
 const mOverlay=document.getElementById('modalOverlay'),tInput=document.getElementById('taskInput'),tTime=document.getElementById('taskTime');let selTag='work';
@@ -618,6 +710,78 @@ document.getElementById('btnSave').addEventListener('click',saveTask);
 tInput.addEventListener('keydown',e=>{if(e.key==='Enter')saveTask()});
 function saveTask(){const ttl=tInput.value.trim();if(!ttl)return;if(!state.tasks[state.selectedDate])state.tasks[state.selectedDate]=[];if(editingTaskIdx>=0){const tk=state.tasks[state.selectedDate][editingTaskIdx];tk.title=ttl;tk.tag=selTag;tk.time=tTime.value||'';tk.notified=false;}else{state.tasks[state.selectedDate].push({title:ttl,tag:selTag,time:tTime.value||'',completed:false,createdAt:Date.now()})}saveLocalState();mOverlay.classList.remove('active');render()}
 let nTO;document.getElementById('dayNotes').addEventListener('input',e=>{clearTimeout(nTO);nTO=setTimeout(()=>{if(e.target.value.trim())state.notes[state.selectedDate]=e.target.value;else delete state.notes[state.selectedDate];saveLocalState()},500)});
+
+// ============================================
+// HORARIOS (SCHEDULE)
+// ============================================
+function getSchColor(act){
+    if(!act || act==='-') return 'sch-gray';
+    const a = act.toLowerCase();
+    if(a.includes('trabajo')) return 'sch-purple';
+    if(a.includes('almuerzo') || a.includes('jugar') || a.includes('kick boxing') || a.includes('limpiar')) return 'sch-green';
+    if(a.includes('inglés')) return 'sch-blue';
+    if(a.includes('pcg') || a.includes('shaders') || a.includes('blender')) return 'sch-orange';
+    if(a.includes('ld') || a.includes('game analysis') || a.includes('proyecto') || a.includes('portfolio')) return 'sch-yellow';
+    return '';
+}
+
+function renderSchedule() {
+    const wTbody = document.querySelector('#schWeekTable tbody');
+    const weTbody = document.querySelector('#schWeekendTable tbody');
+    wTbody.innerHTML = ''; weTbody.innerHTML = '';
+    
+    userSchedule.forEach(slot => {
+        let trW = document.createElement('tr');
+        trW.innerHTML = `<td>${slot.time}</td>`;
+        [1,2,3,4,5].forEach(i => {
+            const act = slot.days[i];
+            trW.innerHTML += `<td class="${getSchColor(act)}" data-day="${i}" data-start="${slot.start}">${escapeHtml(act)}</td>`;
+        });
+        wTbody.appendChild(trW);
+        
+        let trWe = document.createElement('tr');
+        trWe.innerHTML = `<td>${slot.time}</td>`;
+        [6,0].forEach(i => {
+            const act = slot.days[i];
+            trWe.innerHTML += `<td class="${getSchColor(act)}" data-day="${i}" data-start="${slot.start}">${escapeHtml(act)}</td>`;
+        });
+        weTbody.appendChild(trWe);
+    });
+    updateCurrentActivity();
+}
+
+function updateCurrentActivity() {
+    const now = new Date();
+    const curTime = now.getHours() * 60 + now.getMinutes();
+    const curDay = now.getDay();
+    
+    let currentAct = null; let currentSlot = null;
+    for (const slot of userSchedule) {
+        const [sh, sm] = slot.start.split(':').map(Number);
+        const [eh, em] = slot.end.split(':').map(Number);
+        if (curTime >= (sh*60+sm) && curTime < (eh*60+em)) {
+            currentSlot = slot; break;
+        }
+    }
+    
+    document.querySelectorAll('.schedule-table td').forEach(td=>td.classList.remove('sch-active'));
+    const container = document.getElementById('schCurrentContainer');
+    
+    if (currentSlot && currentSlot.days[curDay] && currentSlot.days[curDay] !== '-') {
+        currentAct = currentSlot.days[curDay];
+        document.getElementById('schCurrentTime').textContent = currentSlot.time;
+        document.getElementById('schCurrentName').textContent = currentAct;
+        container.classList.add('active-border');
+        // highlight table cell
+        const actCell = document.querySelector(`.schedule-table td[data-day="${curDay}"][data-start="${currentSlot.start}"]`);
+        if(actCell) actCell.classList.add('sch-active');
+    } else {
+        document.getElementById('schCurrentTime').textContent = '--:--';
+        document.getElementById('schCurrentName').textContent = 'Tiempo Libre / Descanso';
+        container.classList.remove('active-border');
+    }
+}
+
 
 // ============================================
 // POMODORO (Robusto Background)
@@ -673,9 +837,8 @@ function renderGym(){
 
     const tds=state.selectedDate, exes=gymData[tds]||[], lst=document.getElementById('gymList');
     
-    // Calcula calorías estimadas (15 kcal por serie completada)
-    let cals=0;
-    exes.forEach(ex => cals += (ex.sets.length * 15));
+    // Calorías
+    let cals=0; exes.forEach(ex => cals += (ex.sets.length * 15));
     document.getElementById('gymCal').textContent=cals;
 
     if(!exes.length){lst.innerHTML='<div class="empty-state"><div class="empty-icon">🏋️</div><p>Sin entrenamiento registrado hoy.</p></div>';return;}
