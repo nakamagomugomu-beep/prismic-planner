@@ -312,6 +312,7 @@
         <div class="sidebar-header"><svg class="logo-img" style="width:36px;height:36px;"><use href="#prismic-logo"/></svg><div class="sidebar-brand-text"><span>Prismic</span> Planner</div></div>
         <div class="sidebar-nav">
             <div class="nav-item active" data-page="planner"><span class="nav-icon">📋</span>Planner</div>
+            <div class="nav-item" data-page="inbox"><span class="nav-icon">🧠</span>Descarga M.</div>
             <div class="nav-item" data-page="schedule"><span class="nav-icon">📅</span>Horarios</div>
             <div class="nav-item" data-page="pomodoro"><span class="nav-icon">🍅</span>Pomodoro</div>
             <div class="nav-item" data-page="gym"><span class="nav-icon">💪</span>Gimnasio</div>
@@ -324,9 +325,19 @@
     <div class="page active" id="pagePlanner">
         <div class="week-nav" id="weekNav"></div>
         <div class="stats-row"><div class="stat-pill"><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total</div></div><div class="stat-pill"><div class="stat-val" id="statPending">0</div><div class="stat-label">Pendientes</div></div><div class="stat-pill"><div class="stat-val" id="statDone">0</div><div class="stat-label">Hechas</div></div></div>
+        <div class="section-label" style="display:flex; justify-content:space-between; align-items:center;">Micro-Hábitos de Supervivencia <button class="topbar-btn" id="btnResetHabits" style="font-size:12px; padding:2px; margin:0;" title="Reiniciar Hoy">↺</button></div>
+        <div class="task-list" id="habitList" style="margin-bottom:24px; gap:8px;"></div>
+        
         <div class="section-label">Tareas del día</div>
         <div class="task-list" id="taskList"></div>
         <div style="margin-top:32px"><div class="section-label">Notas del día</div><textarea class="notes-textarea" id="dayNotes" placeholder="Escribí lo que necesites recordar hoy..."></textarea></div>
+    </div>
+
+    <!-- INBOX / DESCARGA MENTAL -->
+    <div class="page" id="pageInbox">
+        <div class="stats-row"><div class="stat-pill" style="grid-column: span 3; text-align:left; font-size:13px; font-weight:500; color:var(--text-secondary); text-transform:none; line-height:1.5;"><b>No es una lista de quehaceres obligatorios.</b><br>Es un cajón libre para vaciar tu cabeza de la presión del día a día. Películas que te recomiendan, cosas que <i>"algún día querés estudiar"</i>, libros pendientes, pensamientos sueltos. Dejalo acá para que no consuma tu RAM mental.</div></div>
+        <div class="section-label">Purgatorio de Ideas & Links</div>
+        <textarea class="notes-textarea" id="inboxNotes" placeholder="Soltá todo acá. Series, juegos, ideas, tareas sin fecha. Vacía tu cabeza..." style="min-height:500px; font-size:15px; border-color:var(--border);"></textarea>
     </div>
 
     <!-- SCHEDULE -->
@@ -485,7 +496,7 @@ const defaultCats=[{id:'work',icon:'💼',name:'Trabajo'},{id:'personal',icon:'�
 function getAllCats(){const custom=JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY)||'[]');return[...defaultCats,...custom]}
 function getTodayStr(){return new Date().toISOString().split('T')[0]}
 
-let state={selectedDate:getTodayStr(),tasks:{},notes:{}};
+let state={selectedDate:getTodayStr(),tasks:{},notes:{},habits:{},inbox:''};
 let syncDebounceTimer,currentPin='',isCreatingPin=false,newPinFirst='',pinAttempts=0,editingTaskIdx=-1;
 let pomoState={mode:'work',running:false,timeLeft:25*60,targetTime:0,interval:null,completed:0,totalSeconds:0};
 let pomoSettings={work:25,short:5,long:15,exercise:45,gaming:60,custom:30};
@@ -541,7 +552,7 @@ async function pushToCloud(){
     const u=getSyncUrl();if(!u)return;
     updateSyncUI('syncing','Syncing...');
     try{
-        await fetch(u,{method:'POST',body:JSON.stringify({tasks:state.tasks,notes:state.notes,gym:gymData}),headers:{'Content-Type':'text/plain'}});
+        await fetch(u,{method:'POST',body:JSON.stringify({tasks:state.tasks,notes:state.notes,gym:gymData,habits:state.habits,inbox:state.inbox}),headers:{'Content-Type':'text/plain'}});
         updateSyncUI('synced','Online ✓');
     }catch(e){updateSyncUI('error','Error')}
 }
@@ -555,6 +566,8 @@ async function pullFromCloud(){
             if(d.tasks) state.tasks={...state.tasks,...d.tasks};
             if(d.notes) state.notes={...state.notes,...d.notes};
             if(d.gym) gymData={...gymData,...d.gym};
+            if(d.habits) state.habits={...state.habits,...d.habits};
+            if(d.inbox!==undefined) state.inbox=d.inbox;
             saveLocalState();
         }
         updateSyncUI('synced','Online ✓');
@@ -596,9 +609,9 @@ async function unlockApp(){
     document.getElementById('appShell').classList.add('active');
     if(localStorage.getItem(REMEMBER_KEY)==='true')localStorage.setItem(SESSION_KEY,Date.now().toString());
     loadLocalState(); loadPomoSettings(); loadTheme(); renderCatSelector(); 
-    render(); renderGym(); renderSchedule();
+    render(); renderGym(); renderSchedule(); if(document.getElementById('inboxNotes')){document.getElementById('inboxNotes').value = state.inbox || '';}
     startBackgroundTasks(); await pullFromCloud();
-    render(); renderGym();
+    render(); renderGym(); if(document.getElementById('inboxNotes')){document.getElementById('inboxNotes').value = state.inbox || '';}
 }
 function lockApp(){document.getElementById('appShell').classList.remove('active');localStorage.removeItem(SESSION_KEY);pinAttempts=0;currentPin='';initAuth()}
 
@@ -609,8 +622,8 @@ document.getElementById('btnRecoveryCancel')?.addEventListener('click',()=>initA
 document.getElementById('btnRecoverySubmit')?.addEventListener('click',()=>{const a=document.getElementById('recoveryAnswer').value.trim().toLowerCase();if(a===localStorage.getItem(SECURITY_A_KEY)){localStorage.removeItem(PIN_HASH_KEY);localStorage.removeItem(SESSION_KEY);initAuth()}else document.getElementById('pinError').textContent='Respuesta incorrecta.'});
 document.getElementById('btnLock').addEventListener('click',lockApp);
 
-function loadLocalState(){try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.tasks=p.tasks||{};state.notes=p.notes||{}}const g=localStorage.getItem(GYM_KEY);if(g)gymData=JSON.parse(g)}catch(e){}}
-function saveLocalState(){localStorage.setItem(STORAGE_KEY,JSON.stringify({tasks:state.tasks,notes:state.notes}));localStorage.setItem(GYM_KEY,JSON.stringify(gymData));clearTimeout(syncDebounceTimer);syncDebounceTimer=setTimeout(pushToCloud,2500)}
+function loadLocalState(){try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.tasks=p.tasks||{};state.notes=p.notes||{};state.habits=p.habits||{};state.inbox=p.inbox||''}const g=localStorage.getItem(GYM_KEY);if(g)gymData=JSON.parse(g)}catch(e){}}
+function saveLocalState(){localStorage.setItem(STORAGE_KEY,JSON.stringify({tasks:state.tasks,notes:state.notes,habits:state.habits,inbox:state.inbox}));localStorage.setItem(GYM_KEY,JSON.stringify(gymData));clearTimeout(syncDebounceTimer);syncDebounceTimer=setTimeout(pushToCloud,2500)}
 
 // ============================================
 // NOTIFICATIONS & BACKGROUND
@@ -703,7 +716,41 @@ function render(){
         list.querySelectorAll('[data-edit]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();openEditTask(+el.dataset.edit)}));
     }
     document.getElementById('dayNotes').value=state.notes[state.selectedDate]||'';
+    renderHabits();
 }
+
+const defaultHabits = [
+    {id: 'h1', text: '💧 Tomar un vaso de agua'},
+    {id: 'h2', text: '🛌 Acomodar mi espacio / cama'},
+    {id: 'h3', text: '💬 Responderle a un amigo o familiar'},
+    {id: 'h4', text: '🧘 Tomarme 5 min para despejar la cabeza sin PC'}
+];
+function renderHabits() {
+    if(!state.habits) state.habits = {};
+    if(!state.habits[state.selectedDate]) {
+        state.habits[state.selectedDate] = defaultHabits.map(h => ({id: h.id, text: h.text, done: false}));
+    }
+    const hList = document.getElementById('habitList');
+    if(!hList)return;
+    const dayHabits = state.habits[state.selectedDate];
+    hList.innerHTML = dayHabits.map((h, i) => `
+        <div class="task-card ${h.done?'completed':''}" style="padding:10px 16px; margin-bottom:0; min-height:0; cursor:pointer;">
+            <div class="task-check ${h.done?'checked':''}" data-htab="${i}"></div>
+            <div class="task-content"><div class="task-title" style="margin-bottom:0; font-size:14px; color:${h.done?'var(--text-muted)':'var(--text-primary)'}">${escapeHtml(h.text)}</div></div>
+        </div>`).join('');
+    hList.querySelectorAll('[data-htab]').forEach(el => el.parentElement.addEventListener('click', e => {
+        e.stopPropagation(); const i = +el.dataset.htab;
+        state.habits[state.selectedDate][i].done = !state.habits[state.selectedDate][i].done;
+        saveLocalState(); renderHabits();
+    }));
+}
+document.getElementById('btnResetHabits')?.addEventListener('click', () => {
+    state.habits[state.selectedDate] = defaultHabits.map(h => ({id: h.id, text: h.text, done: false}));
+    saveLocalState(); renderHabits();
+});
+
+let iTO; document.getElementById('inboxNotes')?.addEventListener('input', e => { clearTimeout(iTO); iTO = setTimeout(() => { state.inbox = e.target.value; saveLocalState(); }, 500); });
+
 function escapeHtml(t){if(!t)return ''; const n=document.createElement('div');n.textContent=t;return n.innerHTML}
 
 function renderCatSelector(){document.getElementById('tagSelector').innerHTML=getAllCats().map((c,i)=>`<button class="tag-option ${i===0?'selected':''}" data-tag="${c.id}">${c.icon} ${c.name}</button>`).join('')}
