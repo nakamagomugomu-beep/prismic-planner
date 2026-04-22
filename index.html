@@ -508,13 +508,14 @@ let gymData={};
 // ============================================
 const userSchedule = [
     { time:"07:30 - 08:00", start:"07:30", end:"08:00", days:{ 1:"Meditar / Desayuno", 2:"Meditar / Desayuno", 3:"Meditar / Desayuno", 4:"Meditar / Desayuno", 5:"Meditar / Desayuno", 6:"-", 0:"-" } },
-    { time:"08:00 - 12:00", start:"08:00", end:"12:00", days:{ 1:"Trabajo", 2:"Trabajo", 3:"Trabajo", 4:"Trabajo", 5:"Trabajo", 6:"Páginas IA / 3D", 0:"Limpiar Casa" } },
+    { time:"08:00 - 10:00", start:"08:00", end:"10:00", days:{ 1:"Trabajo", 2:"Trabajo", 3:"Trabajo", 4:"Trabajo", 5:"Trabajo", 6:"Páginas IA / 3D", 0:"Limpiar Casa" } },
+    { time:"10:00 - 12:00", start:"10:00", end:"12:00", days:{ 1:"Trabajo", 2:"Trabajo", 3:"Trabajo", 4:"Trabajo", 5:"Trabajo", 6:"Gimnasio / Pesas", 0:"Limpiar Casa" } },
     { time:"12:00 - 13:15", start:"12:00", end:"13:15", days:{ 1:"Pausa sin pantallas", 2:"Pausa sin pantallas", 3:"Pausa sin pantallas", 4:"Pausa sin pantallas", 5:"Pausa sin pantallas", 6:"-", 0:"-" } },
     { time:"13:15 - 14:15", start:"13:15", end:"14:15", days:{ 1:"Almuerzo", 2:"Almuerzo", 3:"Almuerzo", 4:"Almuerzo", 5:"Almuerzo", 6:"Almuerzo", 0:"Almuerzo" } },
     { time:"14:15 - 18:00", start:"14:15", end:"18:00", days:{ 1:"Trabajo", 2:"Trabajo", 3:"Trabajo", 4:"Trabajo", 5:"Trabajo", 6:"-", 0:"-" } },
-    { time:"18:00 - 19:30", start:"18:00", end:"19:30", days:{ 1:"Páginas IA / 3D", 2:"-", 3:"Páginas IA / 3D", 4:"-", 5:"-", 6:"-", 0:"-" } },
-    { time:"19:30 - 20:00", start:"19:30", end:"20:00", days:{ 1:"-", 2:"Merienda", 3:"-", 4:"Merienda", 5:"Merienda", 6:"-", 0:"-" } },
-    { time:"20:00 - 22:00", start:"20:00", end:"22:00", days:{ 1:"-", 2:"Kick Boxing", 3:"-", 4:"Kick Boxing", 5:"Kick Boxing", 6:"-", 0:"-" } },
+    { time:"18:00 - 19:30", start:"18:00", end:"19:30", days:{ 1:"Páginas IA / 3D", 2:"-", 3:"Páginas IA / 3D", 4:"-", 5:"Level Design", 6:"-", 0:"-" } },
+    { time:"19:30 - 20:00", start:"19:30", end:"20:00", days:{ 1:"-", 2:"Merienda", 3:"Inglés (30 min)", 4:"Merienda", 5:"Merienda", 6:"-", 0:"-" } },
+    { time:"20:00 - 22:00", start:"20:00", end:"22:00", days:{ 1:"-", 2:"Kick Boxing", 3:"-", 4:"Kick Boxing", 5:"Salir / Libre", 6:"-", 0:"-" } },
     { time:"22:00 - 23:30", start:"22:00", end:"23:30", days:{ 1:"Jugar / Anime", 2:"Jugar / Anime", 3:"Jugar / Anime", 4:"Jugar / Anime", 5:"Jugar / Anime", 6:"Jugar / Ocio", 0:"Preparar semana" } }
 ];
 
@@ -773,10 +774,10 @@ function getSchColor(act){
     if(!act || act==='-') return 'sch-gray';
     const a = act.toLowerCase();
     if(a.includes('trabajo')) return 'sch-purple';
-    if(a.includes('almuerzo') || a.includes('jugar') || a.includes('kick boxing') || a.includes('limpiar') || a.includes('pausa')) return 'sch-green';
+    if(a.includes('almuerzo') || a.includes('jugar') || a.includes('kick boxing') || a.includes('gimnasio') || a.includes('limpiar') || a.includes('pausa') || a.includes('libre')) return 'sch-green';
     if(a.includes('meditar') || a.includes('preparar semana') || a.includes('merienda')) return 'sch-blue';
     if(a.includes('pcg') || a.includes('shaders') || a.includes('blender')) return 'sch-orange';
-    if(a.includes('ld') || a.includes('game analysis') || a.includes('páginas ia') || a.includes('portfolio')) return 'sch-yellow';
+    if(a.includes('ld') || a.includes('level design') || a.includes('páginas ia') || a.includes('inglés') || a.includes('portfolio')) return 'sch-yellow';
     return '';
 }
 
