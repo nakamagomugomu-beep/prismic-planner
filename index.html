@@ -119,9 +119,13 @@
         .subtask-input-row input:focus{outline:none;border-color:#e5ff00;}
         .subtask-add-btn{padding:8px 14px;background:#e5ff00;border:none;border-radius:8px;font-weight:700;font-size:18px;cursor:pointer;color:#111;line-height:1;}
         .subtask-modal-list{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
-        .subtask-modal-item{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#1a1a1a;border-radius:8px;font-size:13px;color:#ccc;}
-        .subtask-modal-item button{background:none;border:none;color:#666;cursor:pointer;font-size:14px;padding:2px 6px;}
-        .subtask-modal-item button:hover{color:#ff4d4f;}
+        .subtask-modal-item{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#1a1a1a;border-radius:8px;font-size:13px;color:#ccc;gap:6px;}
+        .subtask-modal-item .sub-text{flex:1;}
+        .subtask-modal-item input{flex:1;background:transparent;border:none;border-bottom:1px solid #e5ff00;color:#fff;font-size:13px;font-family:inherit;outline:none;padding:0 2px;}
+        .subtask-modal-item .sub-btns{display:flex;gap:4px;flex-shrink:0;}
+        .subtask-modal-item button{background:none;border:none;color:#666;cursor:pointer;font-size:13px;padding:2px 5px;}
+        .subtask-modal-item button:hover{color:#e5ff00;}
+        .subtask-modal-item button.del:hover{color:#ff4d4f;}
         .task-actions{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;gap:6px;opacity:0;transition:var(--transition)}
         .task-card:hover .task-actions{opacity:1}
         @media(hover:none){.task-actions{opacity:1}}
@@ -820,9 +824,28 @@ const mOverlay=document.getElementById('modalOverlay'),tInput=document.getElemen
 document.getElementById('fabAdd').addEventListener('click',()=>{editingTaskIdx=-1;pendingSubtasks=[];document.getElementById('modalTitle').textContent='Nueva Meta';openTaskModal('','','work',[])});
 let pendingSubtasks=[];
 function renderSubtaskModalList(){
-    document.getElementById('subtaskModalList').innerHTML=pendingSubtasks.map((s,i)=>
-        `<div class="subtask-modal-item"><span>• ${escapeHtml(s.text)}</span><button data-rmsub="${i}">✕</button></div>`).join('');
-    document.querySelectorAll('[data-rmsub]').forEach(b=>b.addEventListener('click',()=>{pendingSubtasks.splice(+b.dataset.rmsub,1);renderSubtaskModalList()}));
+    const container=document.getElementById('subtaskModalList');
+    container.innerHTML=pendingSubtasks.map((s,i)=>
+        `<div class="subtask-modal-item" data-subrow="${i}">
+            <span class="sub-text">• ${escapeHtml(s.text)}</span>
+            <div class="sub-btns">
+                <button data-editsub="${i}" title="Editar">✎</button>
+                <button class="del" data-rmsub="${i}" title="Eliminar">✕</button>
+            </div>
+        </div>`).join('');
+    container.querySelectorAll('[data-rmsub]').forEach(b=>b.addEventListener('click',()=>{pendingSubtasks.splice(+b.dataset.rmsub,1);renderSubtaskModalList()}));
+    container.querySelectorAll('[data-editsub]').forEach(b=>b.addEventListener('click',()=>{
+        const i=+b.dataset.editsub;
+        const row=container.querySelector(`[data-subrow="${i}"]`);
+        const span=row.querySelector('.sub-text');
+        const inp=document.createElement('input');
+        inp.value=pendingSubtasks[i].text;
+        row.replaceChild(inp,span);
+        inp.focus();inp.select();
+        function commit(){const v=inp.value.trim();if(v)pendingSubtasks[i].text=v;renderSubtaskModalList();}
+        inp.addEventListener('blur',commit);
+        inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();commit();}if(e.key==='Escape'){renderSubtaskModalList();}});
+    }));
 }
 document.getElementById('btnAddSubtask').addEventListener('click',()=>{
     const v=document.getElementById('subtaskInput').value.trim();if(!v)return;
