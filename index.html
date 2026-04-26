@@ -106,6 +106,22 @@
         .task-meta{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
         .task-tag{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px}
         .task-time{font-size:12px;font-weight:600;color:var(--text-muted);display:flex;align-items:center;gap:4px}
+        /* SUBTASKS */
+        .subtask-list{display:flex;flex-direction:column;gap:4px;margin-top:8px;padding-left:8px;border-left:2px solid #333;}
+        .subtask-item{display:flex;align-items:center;gap:8px;font-size:13px;color:#aaa;cursor:pointer;padding:2px 0;transition:color .15s;}
+        .subtask-item.done{color:#555;text-decoration:line-through;}
+        .subtask-item .sub-dot{width:10px;height:10px;min-width:10px;border-radius:50%;border:1.5px solid #555;transition:all .15s;}
+        .subtask-item.done .sub-dot{background:#e5ff00;border-color:#e5ff00;}
+        .subtask-item:hover{color:#fff;}
+        /* Subtask modal */
+        .subtask-input-row{display:flex;gap:8px;margin-top:8px;}
+        .subtask-input-row input{flex:1;padding:8px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#fff;font-family:inherit;font-size:14px;}
+        .subtask-input-row input:focus{outline:none;border-color:#e5ff00;}
+        .subtask-add-btn{padding:8px 14px;background:#e5ff00;border:none;border-radius:8px;font-weight:700;font-size:18px;cursor:pointer;color:#111;line-height:1;}
+        .subtask-modal-list{display:flex;flex-direction:column;gap:6px;margin-top:10px;}
+        .subtask-modal-item{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:#1a1a1a;border-radius:8px;font-size:13px;color:#ccc;}
+        .subtask-modal-item button{background:none;border:none;color:#666;cursor:pointer;font-size:14px;padding:2px 6px;}
+        .subtask-modal-item button:hover{color:#ff4d4f;}
         .task-actions{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;gap:6px;opacity:0;transition:var(--transition)}
         .task-card:hover .task-actions{opacity:1}
         @media(hover:none){.task-actions{opacity:1}}
@@ -490,6 +506,14 @@
     <div class="input-group"><label>Descripción</label><input class="setting-input" type="text" id="taskInput" placeholder="Organizar servidor, estudiar..." autocomplete="off"></div>
     <div class="input-group"><label>Horario (Para Notificación)</label><input class="setting-input" type="time" id="taskTime"></div>
     <div class="input-group"><label>Categoría</label><div class="tag-selector" id="tagSelector"></div></div>
+    <div class="input-group">
+        <label>Sub-Tareas <span style="font-weight:400;opacity:.6;font-size:11px">(opcional)</span></label>
+        <div class="subtask-input-row">
+            <input type="text" id="subtaskInput" placeholder="Nueva sub-tarea..." autocomplete="off">
+            <button class="subtask-add-btn" id="btnAddSubtask">+</button>
+        </div>
+        <div class="subtask-modal-list" id="subtaskModalList"></div>
+    </div>
     <div class="modal-actions"><button class="btn btn-secondary" id="btnCancel">Cancelar</button><button class="btn btn-primary" id="btnSave">Guardar</button></div>
 </div></div>
 
@@ -742,14 +766,16 @@ function render(){
             const idx=t.indexOf(task);const cat=cats.find(c=>c.id===task.tag)||cats[0];
             const tagClass=defaultCats.find(c=>c.id===task.tag)?`tag-${task.tag}`:'';
             const style=tagClass?'':`background:rgba(139,92,246,0.15);color:var(--accent)`;
+            const subsHtml=(task.subtasks&&task.subtasks.length)?`<div class="subtask-list">${task.subtasks.map((s,si)=>`<div class="subtask-item ${s.done?'done':''}" data-subtask="${idx}" data-subidx="${si}"><span class="sub-dot"></span>${escapeHtml(s.text)}</div>`).join('')}</div>`:'';
             return`<div class="task-card ${task.completed?'completed':''}" data-index="${idx}">
             <div class="task-check ${task.completed?'checked':''}" data-toggle="${idx}"></div>
-            <div class="task-content"><div class="task-title">${escapeHtml(task.title)}</div><div class="task-meta"><span class="task-tag ${tagClass}" ${style?`style="${style}"`:''}>${cat.icon} ${cat.name}</span>${task.time?`<span class="task-time">🕐 ${task.time}</span>`:''}</div></div>
+            <div class="task-content"><div class="task-title">${escapeHtml(task.title)}</div><div class="task-meta"><span class="task-tag ${tagClass}" ${style?`style="${style}"`:''} >${cat.icon} ${cat.name}</span>${task.time?`<span class="task-time">🕐 ${task.time}</span>`:''}</div>${subsHtml}</div>
             <div class="task-actions"><button class="task-action-btn task-edit-btn" data-edit="${idx}">✎</button><button class="task-action-btn task-del-btn" data-delete="${idx}">✕</button></div></div>`
         }).join('');
         list.querySelectorAll('[data-toggle]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const i=+el.dataset.toggle;state.tasks[state.selectedDate][i].completed=!state.tasks[state.selectedDate][i].completed;saveLocalState();render()}));
         list.querySelectorAll('[data-delete]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const i=+el.dataset.delete;state.tasks[state.selectedDate].splice(i,1);if(!state.tasks[state.selectedDate].length)delete state.tasks[state.selectedDate];saveLocalState();render()}));
         list.querySelectorAll('[data-edit]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();openEditTask(+el.dataset.edit)}));
+        list.querySelectorAll('.subtask-item').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const i=+el.dataset.subtask,si=+el.dataset.subidx;state.tasks[state.selectedDate][i].subtasks[si].done=!state.tasks[state.selectedDate][i].subtasks[si].done;saveLocalState();render();}));
     }
     document.getElementById('dayNotes').value=state.notes[state.selectedDate]||'';
     renderHabits();
@@ -791,15 +817,31 @@ function escapeHtml(t){if(!t)return ''; const n=document.createElement('div');n.
 
 function renderCatSelector(){document.getElementById('tagSelector').innerHTML=getAllCats().map((c,i)=>`<button class="tag-option ${i===0?'selected':''}" data-tag="${c.id}">${c.icon} ${c.name}</button>`).join('')}
 const mOverlay=document.getElementById('modalOverlay'),tInput=document.getElementById('taskInput'),tTime=document.getElementById('taskTime');let selTag='work';
-document.getElementById('fabAdd').addEventListener('click',()=>{editingTaskIdx=-1;document.getElementById('modalTitle').textContent='Nueva Meta';openTaskModal('','','work')});
-function openTaskModal(tt,tm,tg){mOverlay.classList.add('active');tInput.value=tt;tTime.value=tm;selTag=tg;document.querySelectorAll('.tag-option').forEach(b=>b.classList.toggle('selected',b.dataset.tag===selTag));setTimeout(()=>tInput.focus(),300)}
-function openEditTask(idx){const tk=state.tasks[state.selectedDate][idx];editingTaskIdx=idx;document.getElementById('modalTitle').textContent='Modificar Meta';openTaskModal(tk.title,tk.time||'',tk.tag||'work')}
+document.getElementById('fabAdd').addEventListener('click',()=>{editingTaskIdx=-1;pendingSubtasks=[];document.getElementById('modalTitle').textContent='Nueva Meta';openTaskModal('','','work',[])});
+let pendingSubtasks=[];
+function renderSubtaskModalList(){
+    document.getElementById('subtaskModalList').innerHTML=pendingSubtasks.map((s,i)=>
+        `<div class="subtask-modal-item"><span>• ${escapeHtml(s.text)}</span><button data-rmsub="${i}">✕</button></div>`).join('');
+    document.querySelectorAll('[data-rmsub]').forEach(b=>b.addEventListener('click',()=>{pendingSubtasks.splice(+b.dataset.rmsub,1);renderSubtaskModalList()}));
+}
+document.getElementById('btnAddSubtask').addEventListener('click',()=>{
+    const v=document.getElementById('subtaskInput').value.trim();if(!v)return;
+    pendingSubtasks.push({text:v,done:false});document.getElementById('subtaskInput').value='';renderSubtaskModalList();
+});
+document.getElementById('subtaskInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('btnAddSubtask').click();}});
+function openTaskModal(tt,tm,tg,subs){
+    mOverlay.classList.add('active');tInput.value=tt;tTime.value=tm;selTag=tg;
+    pendingSubtasks=subs?JSON.parse(JSON.stringify(subs)):[];
+    renderSubtaskModalList();
+    document.querySelectorAll('.tag-option').forEach(b=>b.classList.toggle('selected',b.dataset.tag===selTag));setTimeout(()=>tInput.focus(),300);
+}
+function openEditTask(idx){const tk=state.tasks[state.selectedDate][idx];editingTaskIdx=idx;document.getElementById('modalTitle').textContent='Modificar Meta';openTaskModal(tk.title,tk.time||'',tk.tag||'work',tk.subtasks||[])}
 document.getElementById('btnCancel').addEventListener('click',()=>mOverlay.classList.remove('active'));
 mOverlay.addEventListener('click',e=>{if(e.target===mOverlay)mOverlay.classList.remove('active')});
 document.getElementById('tagSelector').addEventListener('click',e=>{const b=e.target.closest('.tag-option');if(b){selTag=b.dataset.tag;document.querySelectorAll('.tag-option').forEach(x=>x.classList.toggle('selected',x.dataset.tag===selTag))}});
 document.getElementById('btnSave').addEventListener('click',saveTask);
 tInput.addEventListener('keydown',e=>{if(e.key==='Enter')saveTask()});
-function saveTask(){const ttl=tInput.value.trim();if(!ttl)return;if(!state.tasks[state.selectedDate])state.tasks[state.selectedDate]=[];if(editingTaskIdx>=0){const tk=state.tasks[state.selectedDate][editingTaskIdx];tk.title=ttl;tk.tag=selTag;tk.time=tTime.value||'';tk.notified=false;}else{state.tasks[state.selectedDate].push({title:ttl,tag:selTag,time:tTime.value||'',completed:false,createdAt:Date.now()})}saveLocalState();mOverlay.classList.remove('active');render()}
+function saveTask(){const ttl=tInput.value.trim();if(!ttl)return;if(!state.tasks[state.selectedDate])state.tasks[state.selectedDate]=[];if(editingTaskIdx>=0){const tk=state.tasks[state.selectedDate][editingTaskIdx];tk.title=ttl;tk.tag=selTag;tk.time=tTime.value||'';tk.notified=false;tk.subtasks=JSON.parse(JSON.stringify(pendingSubtasks));}else{state.tasks[state.selectedDate].push({title:ttl,tag:selTag,time:tTime.value||'',completed:false,createdAt:Date.now(),subtasks:JSON.parse(JSON.stringify(pendingSubtasks))})}saveLocalState();mOverlay.classList.remove('active');render()}
 let nTO;document.getElementById('dayNotes').addEventListener('input',e=>{clearTimeout(nTO);nTO=setTimeout(()=>{if(e.target.value.trim())state.notes[state.selectedDate]=e.target.value;else delete state.notes[state.selectedDate];saveLocalState()},500)});
 
 // ============================================
