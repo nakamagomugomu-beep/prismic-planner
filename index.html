@@ -143,6 +143,34 @@
         .task-edit-btn:hover{background:var(--accent);color:white}
         .task-del-btn{background:rgba(239,68,68,.15);color:var(--danger)}
         .task-del-btn:hover{background:var(--danger);color:white}
+
+        /* NOTEPAD / INBOX V2 */
+        .notepad-container { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+        .notepad-sidebar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+        .notepad-sidebar::-webkit-scrollbar { display: none; }
+        .folder-chip { padding: 8px 16px; background: #111; border: 1px solid #333; border-radius: 20px; font-size: 13px; font-weight: 700; color: #aaa; cursor: pointer; white-space: nowrap; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+        .folder-chip:hover { border-color: var(--accent); color: #fff; }
+        .folder-chip.active { background: var(--accent); color: #000; border-color: var(--accent); }
+        .folder-chip.add-btn { border-style: dashed; background: transparent; }
+
+        .notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .note-card { background: #111; border: 1px solid #333; border-radius: 12px; padding: 12px; cursor: pointer; transition: var(--transition); min-height: 100px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .note-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .note-card.active { border-color: var(--accent); background: var(--accent-glow); }
+        .note-card .note-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .note-card .note-preview { font-size: 11px; color: #666; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+        .note-card.add-note { border-style: dashed; background: transparent; justify-content: center; align-items: center; text-align: center; color: #444; }
+        .note-card.add-note:hover { color: var(--accent); }
+        
+        .note-editor-modal { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; }
+        .note-editor-modal.active { display: flex; }
+        .editor-header { padding: 16px; background: #111; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
+        .editor-title-input { background: transparent; border: none; color: #fff; font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; outline: none; flex: 1; }
+        .editor-textarea { flex: 1; background: #000; border: none; color: #eee; padding: 20px; font-size: 16px; line-height: 1.6; outline: none; resize: none; font-family: 'Inter', sans-serif; }
+        
+        .note-actions { display: flex; gap: 8px; }
+        .note-del-btn { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; background: rgba(255,77,79,0.1); color: #ff4d4f; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; opacity: 0; transition: .2s; }
+        .note-card:hover .note-del-btn { opacity: 1; }
         
         .empty-state{text-align:center;padding:64px 20px;color:#aaa;background:#111;border:1px solid #333;border-radius:24px;position:relative;overflow:hidden;}
         .empty-state .empty-icon{font-size:56px;margin-bottom:16px;opacity:0.1;position:absolute;bottom:-10px;right:10px;}
@@ -381,9 +409,29 @@
 
     <!-- INBOX / DESCARGA MENTAL -->
     <div class="page" id="pageInbox">
-        <div class="stats-row"><div class="stat-pill" style="grid-column: span 3; text-align:left; font-size:13px; font-weight:500; color:var(--text-secondary); text-transform:none; line-height:1.5;"><b>No es una lista de quehaceres obligatorios.</b><br>Es un cajón libre para vaciar tu cabeza de la presión del día a día. Películas que te recomiendan, cosas que <i>"algún día querés estudiar"</i>, libros pendientes, pensamientos sueltos. Dejalo acá para que no consuma tu RAM mental.</div></div>
-        <div class="section-label">Purgatorio de Ideas & Links</div>
-        <textarea class="notes-textarea" id="inboxNotes" placeholder="Soltá todo acá. Series, juegos, ideas, tareas sin fecha. Vacía tu cabeza..." style="min-height:500px; font-size:15px; border-color:var(--border);"></textarea>
+        <div class="stats-row"><div class="stat-pill" style="grid-column: span 3; text-align:left; font-size:13px; font-weight:500; color:var(--text-secondary); text-transform:none; line-height:1.5;"><b>Descarga Mental (Mental Download)</b><br>Vaciá tu cabeza. Películas, libros, ideas locas. Dejalo acá para que no consuma tu RAM mental.</div></div>
+        
+        <div class="notepad-container">
+            <div class="notepad-sidebar" id="inboxFolders">
+                <!-- Folders chips here -->
+            </div>
+            
+            <div class="notes-grid" id="inboxNotesGrid">
+                <!-- Notes cards here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- FULL SCREEN NOTE EDITOR -->
+    <div class="note-editor-modal" id="noteEditor">
+        <div class="editor-header">
+            <button class="topbar-btn" id="btnCloseEditor" title="Volver">◀</button>
+            <input type="text" class="editor-title-input" id="editorTitle" placeholder="Título de la nota...">
+            <div class="note-actions">
+                <button class="topbar-btn" id="btnDelNote" title="Eliminar" style="color:var(--danger)">✕</button>
+            </div>
+        </div>
+        <textarea class="editor-textarea" id="editorText" placeholder="Empezá a escribir..."></textarea>
     </div>
 
     <!-- SCHEDULE -->
@@ -723,9 +771,8 @@ async function unlockApp(){
     document.getElementById('appShell').classList.add('active');
     if(localStorage.getItem(REMEMBER_KEY)==='true')localStorage.setItem(SESSION_KEY,Date.now().toString());
     loadLocalState(); loadPomoSettings(); loadTheme(); renderCatSelector(); 
-    render(); renderGym(); renderSchedule(); if(document.getElementById('inboxNotes')){document.getElementById('inboxNotes').value = state.inbox || '';}
+    render(); renderGym(); renderSchedule(); renderInbox();
     startBackgroundTasks(); await pullFromCloud();
-    render(); renderGym(); if(document.getElementById('inboxNotes')){document.getElementById('inboxNotes').value = state.inbox || '';}
 }
 function lockApp(){document.getElementById('appShell').classList.remove('active');localStorage.removeItem(SESSION_KEY);pinAttempts=0;currentPin='';initAuth()}
 
@@ -736,7 +783,30 @@ document.getElementById('btnRecoveryCancel')?.addEventListener('click',()=>initA
 document.getElementById('btnRecoverySubmit')?.addEventListener('click',()=>{const a=document.getElementById('recoveryAnswer').value.trim().toLowerCase();if(a===localStorage.getItem(SECURITY_A_KEY)){localStorage.removeItem(PIN_HASH_KEY);localStorage.removeItem(SESSION_KEY);initAuth()}else document.getElementById('pinError').textContent='Respuesta incorrecta.'});
 document.getElementById('btnLock').addEventListener('click',lockApp);
 
-function loadLocalState(){try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);state.tasks=p.tasks||{};state.notes=p.notes||{};state.habits=p.habits||{};state.inbox=p.inbox||''}const g=localStorage.getItem(GYM_KEY);if(g)gymData=JSON.parse(g)}catch(e){}}
+function loadLocalState(){
+    try{
+        const s=localStorage.getItem(STORAGE_KEY);
+        if(s){
+            const p=JSON.parse(s);
+            state.tasks=p.tasks||{};
+            state.notes=p.notes||{};
+            state.habits=p.habits||{};
+            state.inbox=p.inbox||'';
+            // Migración: si inbox es un string, convertirlo a objeto con carpetas
+            if(typeof state.inbox === 'string'){
+                const oldContent = state.inbox;
+                state.inbox = {
+                    folders: [{id:'f_'+Date.now(), name:'General', notes: oldContent ? [{id:'n_'+Date.now(), title:'Nota migrada', content:oldContent}] : []}],
+                    activeFolder: null,
+                    activeNote: null
+                };
+                if(state.inbox.folders.length) state.inbox.activeFolder = state.inbox.folders[0].id;
+            }
+        }
+        const g=localStorage.getItem(GYM_KEY);
+        if(g)gymData=JSON.parse(g)
+    }catch(e){}
+}
 function saveLocalState(){localStorage.setItem(STORAGE_KEY,JSON.stringify({tasks:state.tasks,notes:state.notes,habits:state.habits,inbox:state.inbox}));localStorage.setItem(GYM_KEY,JSON.stringify(gymData));clearTimeout(syncDebounceTimer);syncDebounceTimer=setTimeout(pushToCloud,2500)}
 
 // ============================================
@@ -912,7 +982,115 @@ document.getElementById('btnResetHabits')?.addEventListener('click', () => {
     saveLocalState(); renderHabits();
 });
 
-let iTO; document.getElementById('inboxNotes')?.addEventListener('input', e => { clearTimeout(iTO); iTO = setTimeout(() => { state.inbox = e.target.value; saveLocalState(); }, 500); });
+// ============================================
+// NOTEPAD / INBOX V2 LOGIC
+// ============================================
+function renderInbox() {
+    const foldersContainer = document.getElementById('inboxFolders');
+    const notesGrid = document.getElementById('inboxNotesGrid');
+    if (!foldersContainer || !notesGrid) return;
+
+    if (!state.inbox.folders) state.inbox = { folders: [{id:'f_def', name:'General', notes:[]}], activeFolder:'f_def', activeNote:null };
+
+    // Render Folders
+    foldersContainer.innerHTML = state.inbox.folders.map(f => `
+        <div class="folder-chip ${f.id === state.inbox.activeFolder ? 'active' : ''}" data-folder="${f.id}">
+            📂 ${f.name}
+        </div>
+    `).join('') + `<div class="folder-chip add-btn" id="btnAddFolder">+ Nueva Carpeta</div>`;
+
+    // Render Notes in Active Folder
+    const activeFolder = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
+    if (activeFolder) {
+        notesGrid.innerHTML = activeFolder.notes.map(n => `
+            <div class="note-card" data-note="${n.id}">
+                <div>
+                    <div class="note-title">${escapeHtml(n.title) || 'Sin título'}</div>
+                    <div class="note-preview">${escapeHtml(n.content.substring(0, 60))}...</div>
+                </div>
+                <button class="note-del-btn" data-delnote="${n.id}">✕</button>
+            </div>
+        `).join('') + `
+            <div class="note-card add-note" id="btnAddNote">
+                <div style="font-size:24px; margin-bottom:4px;">+</div>
+                <div style="font-size:12px; font-weight:700;">Nueva Nota</div>
+            </div>`;
+    }
+
+    // Events
+    foldersContainer.querySelectorAll('[data-folder]').forEach(el => el.addEventListener('click', () => {
+        state.inbox.activeFolder = el.dataset.folder;
+        renderInbox();
+    }));
+    document.getElementById('btnAddFolder').onclick = () => {
+        const name = prompt('Nombre de la carpeta:');
+        if (name) {
+            const id = 'f_' + Date.now();
+            state.inbox.folders.push({ id, name, notes: [] });
+            state.inbox.activeFolder = id;
+            saveLocalState(); renderInbox();
+        }
+    };
+
+    notesGrid.querySelectorAll('[data-note]').forEach(el => el.addEventListener('click', () => {
+        openNoteEditor(el.dataset.note);
+    }));
+    notesGrid.querySelectorAll('[data-delnote]').forEach(btn => btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (confirm('¿Eliminar esta nota?')) {
+            const f = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
+            f.notes = f.notes.filter(n => n.id !== btn.dataset.delnote);
+            saveLocalState(); renderInbox();
+        }
+    }));
+    document.getElementById('btnAddNote')?.addEventListener('click', () => {
+        const f = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
+        const newNote = { id: 'n_' + Date.now(), title: '', content: '' };
+        f.notes.push(newNote);
+        saveLocalState(); renderInbox();
+        openNoteEditor(newNote.id);
+    });
+}
+
+function openNoteEditor(noteId) {
+    const f = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
+    const n = f.notes.find(n => n.id === noteId);
+    state.inbox.activeNote = noteId;
+    
+    document.getElementById('editorTitle').value = n.title;
+    document.getElementById('editorText').value = n.content;
+    document.getElementById('noteEditor').classList.add('active');
+}
+
+let noteSaveTO;
+function saveCurrentNote() {
+    clearTimeout(noteSaveTO);
+    noteSaveTO = setTimeout(() => {
+        const f = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
+        const n = f.notes.find(n => n.id === state.inbox.activeNote);
+        if (n) {
+            n.title = document.getElementById('editorTitle').value;
+            n.content = document.getElementById('editorText').value;
+            saveLocalState();
+        }
+    }, 500);
+}
+
+document.getElementById('editorTitle')?.addEventListener('input', saveCurrentNote);
+document.getElementById('editorText')?.addEventListener('input', saveCurrentNote);
+document.getElementById('btnCloseEditor')?.addEventListener('click', () => {
+    document.getElementById('noteEditor').classList.remove('active');
+    renderInbox();
+});
+document.getElementById('btnDelNote')?.addEventListener('click', () => {
+    if (confirm('¿Eliminar esta nota?')) {
+        const f = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
+        f.notes = f.notes.filter(n => n.id !== state.inbox.activeNote);
+        saveLocalState();
+        document.getElementById('noteEditor').classList.remove('active');
+        renderInbox();
+    }
+});
 
 function escapeHtml(t){if(!t)return ''; const n=document.createElement('div');n.textContent=t;return n.innerHTML}
 
