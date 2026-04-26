@@ -496,6 +496,11 @@
             <div class="setting-row"><div><div class="setting-label">Tema Oscuro</div><div class="setting-desc">Alternar paleta de colores</div></div><button class="toggle on" id="toggleTheme"></button></div>
         </div>
         
+        <div class="setting-group" id="installGroup" style="display:none;">
+            <h3>📲 Instalar Aplicación</h3>
+            <div class="setting-row column"><div class="setting-desc" style="margin-bottom:12px;">Instalá Prismic Planner en tu PC o celular para acceder más rápido y sin conexión.</div><button class="btn btn-primary" id="btnInstallApp">Instalar App</button></div>
+        </div>
+        
         <div class="setting-group">
             <h3>🔒 Seguridad & Cuenta</h3>
             <div class="setting-row"><div><div class="setting-label">Mantener Sesión</div><div class="setting-desc">No pedir PIN por 4 horas</div></div><button class="toggle" id="toggleRemember"></button></div>
@@ -1197,6 +1202,31 @@ document.querySelectorAll('.pomo-setting').forEach(el=>el.addEventListener('chan
 
 function renderCustomCatList(){const cats=JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY)||'[]'),el=document.getElementById('customCatList');if(!cats.length){el.innerHTML='';return}el.innerHTML=cats.map((c,i)=>`<div class="setting-row"><div class="setting-label">${c.icon} ${c.name}</div><button class="task-action-btn task-del-btn" style="position:static;opacity:1" data-del-cat="${i}">✕</button></div>`).join('');el.querySelectorAll('[data-del-cat]').forEach(b=>b.addEventListener('click',()=>{cats.splice(+b.dataset.delCat,1);localStorage.setItem(CUSTOM_CATS_KEY,JSON.stringify(cats));renderCustomCatList();renderCatSelector();render()}))}
 document.getElementById('btnAddCat').addEventListener('click',()=>{const icon=document.getElementById('newCatIcon').value.trim()||'📌',name=document.getElementById('newCatName').value.trim();if(!name)return;const cats=JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY)||'[]');cats.push({id:'c_'+Date.now(),icon,name});localStorage.setItem(CUSTOM_CATS_KEY,JSON.stringify(cats));document.getElementById('newCatIcon').value='';document.getElementById('newCatName').value='';renderCustomCatList();renderCatSelector()});
+
+// ============================================
+// PWA INSTALLATION & SERVICE WORKER
+// ============================================
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installGroup').style.display = 'block';
+});
+document.getElementById('btnInstallApp')?.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            document.getElementById('installGroup').style.display = 'none';
+        }
+        deferredPrompt = null;
+    }
+});
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js');
+  });
+}
 
 initAuth();
 </script>
