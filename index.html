@@ -375,7 +375,7 @@
         <div class="sidebar-header"><svg class="logo-img" style="width:36px;height:36px;"><use href="#prismic-logo"/></svg><div class="sidebar-brand-text"><span>Prismic</span> Planner</div></div>
         <div class="sidebar-nav">
             <div class="nav-item active" data-page="planner"><span class="nav-icon">📋</span><div class="nav-text">PLANNER<span class="jp">プランナー</span></div></div>
-            <div class="nav-item" data-page="inbox"><span class="nav-icon">🧠</span><div class="nav-text">BLOC DE NOTAS<span class="jp">メモ帳</span></div></div>
+            <div class="nav-item" data-page="inbox"><span class="nav-icon">📝</span><div class="nav-text">BLOC DE NOTAS<span class="jp">メモ帳</span></div></div>
             <div class="nav-item" data-page="schedule"><span class="nav-icon">📅</span><div class="nav-text">HORARIOS<span class="jp">スケジュール</span></div></div>
             <div class="nav-item" data-page="pomodoro"><span class="nav-icon">🍅</span><div class="nav-text">POMODORO<span class="jp">ポモドーロ</span></div></div>
             <div class="nav-item" data-page="gym"><span class="nav-icon">💪</span><div class="nav-text">GIMNASIO<span class="jp">ジム</span></div></div>
@@ -409,7 +409,7 @@
 
     <!-- INBOX / DESCARGA MENTAL -->
     <div class="page" id="pageInbox">
-        <div class="stats-row"><div class="stat-pill" style="grid-column: span 3; text-align:left; font-size:13px; font-weight:500; color:var(--text-secondary); text-transform:none; line-height:1.5;"><b>No es una lista de quehaceres obligatorios.</b><br>Es un cajón libre para vaciar tu cabeza de la presión del día a día. Películas que te recomiendan, cosas que <i>"algún día querés estudiar"</i>, libros pendientes, pensamientos sueltos. Dejalo acá para que no consuma tu RAM mental.</div></div>
+        <div class="stats-row"><div class="stat-pill" style="grid-column: span 3; text-align:left; font-size:13px; font-weight:500; color:var(--text-secondary); text-transform:none; line-height:1.5;"><b>Descarga Mental.</b> No es una lista de quehaceres obligatorios.<br>Es un cajón libre para vaciar tu cabeza de la presión del día a día. Películas que te recomiendan, cosas que <i>"algún día querés estudiar"</i>, libros pendientes, pensamientos sueltos. Dejalo acá para que no consuma tu RAM mental.</div></div>
         
         <div class="notepad-container">
             <div class="notepad-sidebar" id="inboxFolders">
@@ -1001,10 +1001,10 @@ function renderInbox() {
     }
 
     // Render Folders
-    // Render Folders
     foldersContainer.innerHTML = state.inbox.folders.map(f => `
         <div class="folder-chip ${f.id === state.inbox.activeFolder ? 'active' : ''}" data-folder="${f.id}" oncontextmenu="editFolder('${f.id}'); return false;">
-            📂 ${f.name}
+            📂 ${escapeHtml(f.name)}
+            ${f.id === state.inbox.activeFolder ? `<span style="margin-left:4px; font-size:14px; cursor:pointer;" onclick="event.stopPropagation(); editFolder('${f.id}')" title="Opciones">⚙️</span>` : ''}
         </div>
     `).join('') + `<div class="folder-chip add-btn" id="btnAddFolder">+ Nueva Carpeta</div>`;
 
