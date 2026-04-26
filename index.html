@@ -375,7 +375,7 @@
         <div class="sidebar-header"><svg class="logo-img" style="width:36px;height:36px;"><use href="#prismic-logo"/></svg><div class="sidebar-brand-text"><span>Prismic</span> Planner</div></div>
         <div class="sidebar-nav">
             <div class="nav-item active" data-page="planner"><span class="nav-icon">📋</span><div class="nav-text">PLANNER<span class="jp">プランナー</span></div></div>
-            <div class="nav-item" data-page="inbox"><span class="nav-icon">📝</span><div class="nav-text">BLOC DE NOTAS<span class="jp">メモ帳</span></div></div>
+            <div class="nav-item" data-page="inbox"><span class="nav-icon">🧠</span><div class="nav-text">DESCARGA M.<span class="jp">ダウンロード</span></div></div>
             <div class="nav-item" data-page="schedule"><span class="nav-icon">📅</span><div class="nav-text">HORARIOS<span class="jp">スケジュール</span></div></div>
             <div class="nav-item" data-page="pomodoro"><span class="nav-icon">🍅</span><div class="nav-text">POMODORO<span class="jp">ポモドーロ</span></div></div>
             <div class="nav-item" data-page="gym"><span class="nav-icon">💪</span><div class="nav-text">GIMNASIO<span class="jp">ジム</span></div></div>
@@ -409,7 +409,8 @@
 
     <!-- INBOX / DESCARGA MENTAL -->
     <div class="page" id="pageInbox">
-        <div class="stats-row"><div class="stat-pill" style="grid-column: span 3; text-align:left; font-size:13px; font-weight:500; color:var(--text-secondary); text-transform:none; line-height:1.5;"><b>Descarga Mental.</b> No es una lista de quehaceres obligatorios.<br>Es un cajón libre para vaciar tu cabeza de la presión del día a día. Películas que te recomiendan, cosas que <i>"algún día querés estudiar"</i>, libros pendientes, pensamientos sueltos. Dejalo acá para que no consuma tu RAM mental.</div></div>
+        <div class="section-label" style="margin-top:0;">Descarga Mental<span class="jp">ダウンロード</span></div>
+        <div class="stats-row"><div class="stat-pill" style="grid-column: span 3; text-align:left; font-size:13px; font-weight:500; color:var(--text-secondary); text-transform:none; line-height:1.5;"><b>No es una lista de quehaceres obligatorios.</b><br>Es un cajón libre para vaciar tu cabeza de la presión del día a día. Películas que te recomiendan, cosas que <i>"algún día querés estudiar"</i>, libros pendientes, pensamientos sueltos. Dejalo acá para que no consuma tu RAM mental.</div></div>
         
         <div class="notepad-container">
             <div class="notepad-sidebar" id="inboxFolders">
@@ -426,11 +427,45 @@
     <div class="note-editor-modal" id="noteEditor">
         <div class="editor-header">
             <button class="topbar-btn" id="btnCloseEditor" title="Volver">◀</button>
+            <input type="text" class="editor-title-input" id="editorTitle" placeholder="Título de la nota...">
             <div class="note-actions">
+                <button class="topbar-btn" id="btnToggleMd" title="Preview Markdown">👁️</button>
                 <button class="topbar-btn" id="btnDelNote" title="Eliminar" style="color:var(--danger)">✕</button>
             </div>
         </div>
         <textarea class="editor-textarea" id="editorText" placeholder="Empezá a escribir..."></textarea>
+        <div class="editor-preview" id="editorPreview" style="display:none; flex:1; background:#000; color:#eee; padding:20px; font-size:16px; line-height:1.6; overflow-y:auto; font-family:'Inter', sans-serif;"></div>
+    </div>
+
+    </div>
+
+    <!-- FOLDER MODAL -->
+    <div class="modal-overlay" id="folderModal" style="display:none; z-index:1100; flex-direction:column; align-items:center; justify-content:center; background:rgba(10,10,15,0.95)">
+        <div class="modal" style="width:100%; max-width:400px; padding:24px;">
+            <div class="modal-title" style="margin-bottom:20px;">Opciones de Carpeta</div>
+            <div class="input-group">
+                <label>NOMBRE</label>
+                <input type="text" id="folderEditName" class="form-input">
+            </div>
+            <div class="input-group" style="margin-top:16px;">
+                <label>COLOR (Borde/Fondo activo)</label>
+                <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;" id="folderColorPicker">
+                    <button class="tag-option selected" data-color="#e5ff00" style="background:rgba(229,255,0,0.1); border-color:#e5ff00; color:#e5ff00;">Amarillo</button>
+                    <button class="tag-option" data-color="#00f0ff" style="background:rgba(0,240,255,0.1); border-color:#00f0ff; color:#00f0ff;">Cian</button>
+                    <button class="tag-option" data-color="#ff0055" style="background:rgba(255,0,85,0.1); border-color:#ff0055; color:#ff0055;">Carmín</button>
+                    <button class="tag-option" data-color="#8b5cf6" style="background:rgba(139,92,246,0.1); border-color:#8b5cf6; color:#8b5cf6;">Morado</button>
+                    <button class="tag-option" data-color="#22c55e" style="background:rgba(34,197,94,0.1); border-color:#22c55e; color:#22c55e;">Verde</button>
+                    <button class="tag-option" data-color="#a3a3a3" style="background:rgba(163,163,163,0.1); border-color:#a3a3a3; color:#a3a3a3;">Gris</button>
+                </div>
+            </div>
+            <div class="modal-actions" style="margin-top:32px;">
+                <button class="btn btn-secondary" id="btnFolderCancel">CANCELAR</button>
+                <button class="btn btn-primary" id="btnFolderSave">GUARDAR</button>
+            </div>
+            <div style="margin-top:16px; border-top:1px dashed #333; padding-top:16px;">
+                <button class="btn" id="btnFolderDelete" style="width:100%; background:rgba(239,68,68,.15); color:var(--danger); border-color:transparent;">ELIMINAR CARPETA</button>
+            </div>
+        </div>
     </div>
 
     <!-- SCHEDULE -->
@@ -1001,12 +1036,15 @@ function renderInbox() {
     }
 
     // Render Folders
-    foldersContainer.innerHTML = state.inbox.folders.map(f => `
-        <div class="folder-chip ${f.id === state.inbox.activeFolder ? 'active' : ''}" data-folder="${f.id}" oncontextmenu="editFolder('${f.id}'); return false;">
+    foldersContainer.innerHTML = state.inbox.folders.map(f => {
+        const cStyle = f.color ? `style="border-color:${f.color}; ${f.id === state.inbox.activeFolder ? `background:rgba(${hexToRgb(f.color)},0.15); color:${f.color};` : ''}"` : '';
+        return `
+        <div class="folder-chip ${f.id === state.inbox.activeFolder ? 'active' : ''}" data-folder="${f.id}" ${cStyle}>
             📂 ${escapeHtml(f.name)}
             ${f.id === state.inbox.activeFolder ? `<span style="margin-left:4px; font-size:14px; cursor:pointer;" onclick="event.stopPropagation(); editFolder('${f.id}')" title="Opciones">⚙️</span>` : ''}
         </div>
-    `).join('') + `<div class="folder-chip add-btn" id="btnAddFolder">+ Nueva Carpeta</div>`;
+        `;
+    }).join('') + `<div class="folder-chip add-btn" id="btnAddFolder">+ Nueva Carpeta</div>`;
 
     // Render Notes in Active Folder
     const activeFolder = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
@@ -1066,8 +1104,11 @@ function openNoteEditor(noteId) {
     const n = f.notes.find(n => n.id === noteId);
     state.inbox.activeNote = noteId;
     
+    document.getElementById('editorTitle').value = n.title;
     document.getElementById('editorText').value = n.content;
     document.getElementById('noteEditor').classList.add('active');
+    document.getElementById('editorPreview').style.display = 'none';
+    document.getElementById('editorText').style.display = 'block';
 }
 
 let noteSaveTO;
@@ -1077,30 +1118,63 @@ function saveCurrentNote() {
         const f = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
         const n = f.notes.find(n => n.id === state.inbox.activeNote);
         if (n) {
+            n.title = document.getElementById('editorTitle').value;
             n.content = document.getElementById('editorText').value;
-            const lines = n.content.split('\\n').filter(l => l.trim().length > 0);
-            n.title = lines.length > 0 ? lines[0].replace(/^#+\\s*/, '') : 'Sin título';
             saveLocalState();
         }
     }, 500);
 }
 
+let editingFolderId = null;
 window.editFolder = function(id) {
     const f = state.inbox.folders.find(x => x.id === id);
     if (!f) return;
-    const newName = prompt('Renombrar carpeta (Dejá vacío para eliminar):', f.name);
-    if (newName === null) return;
-    if (newName.trim() === '') {
-        if (confirm('¿Seguro que querés ELIMINAR esta carpeta y TODAS sus notas?')) {
-            state.inbox.folders = state.inbox.folders.filter(x => x.id !== id);
-            if(state.inbox.activeFolder === id) state.inbox.activeFolder = state.inbox.folders.length ? state.inbox.folders[0].id : null;
-        }
-    } else {
-        f.name = newName.trim();
-    }
-    saveLocalState(); renderInbox();
+    editingFolderId = id;
+    document.getElementById('folderEditName').value = f.name;
+    document.querySelectorAll('#folderColorPicker .tag-option').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.color === (f.color || ''));
+    });
+    document.getElementById('folderModal').style.display = 'flex';
 };
 
+document.querySelectorAll('#folderColorPicker .tag-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('#folderColorPicker .tag-option').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+    });
+});
+
+document.getElementById('btnFolderCancel')?.addEventListener('click', () => {
+    document.getElementById('folderModal').style.display = 'none';
+});
+
+document.getElementById('btnFolderSave')?.addEventListener('click', () => {
+    const f = state.inbox.folders.find(x => x.id === editingFolderId);
+    if (f) {
+        f.name = document.getElementById('folderEditName').value.trim() || 'Sin Nombre';
+        const selectedColorBtn = document.querySelector('#folderColorPicker .tag-option.selected');
+        f.color = selectedColorBtn ? selectedColorBtn.dataset.color : '';
+        saveLocalState(); renderInbox();
+    }
+    document.getElementById('folderModal').style.display = 'none';
+});
+
+document.getElementById('btnFolderDelete')?.addEventListener('click', () => {
+    if (confirm('¿Seguro que querés ELIMINAR esta carpeta y TODAS sus notas?')) {
+        state.inbox.folders = state.inbox.folders.filter(x => x.id !== editingFolderId);
+        if(state.inbox.activeFolder === editingFolderId) state.inbox.activeFolder = state.inbox.folders.length ? state.inbox.folders[0].id : null;
+        saveLocalState(); renderInbox();
+        document.getElementById('folderModal').style.display = 'none';
+    }
+});
+
+function hexToRgb(hex) {
+    if(!hex) return '229,255,0';
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '229,255,0';
+}
+
+document.getElementById('editorTitle')?.addEventListener('input', saveCurrentNote);
 document.getElementById('editorText')?.addEventListener('input', saveCurrentNote);
 document.getElementById('btnCloseEditor')?.addEventListener('click', () => {
     document.getElementById('noteEditor').classList.remove('active');
@@ -1113,6 +1187,34 @@ document.getElementById('btnDelNote')?.addEventListener('click', () => {
         saveLocalState();
         document.getElementById('noteEditor').classList.remove('active');
         renderInbox();
+    }
+});
+
+function parseMarkdown(text) {
+    let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    html = html.replace(/^### (.*$)/gim, '<h3 style="margin:16px 0 8px; color:var(--accent)">$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2 style="margin:20px 0 10px; color:var(--accent)">$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1 style="margin:24px 0 12px; color:var(--accent)">$1</h1>');
+    html = html.replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>');
+    html = html.replace(/\*(.*?)\*/gim, '<i>$1</i>');
+    html = html.replace(/__(.*?)__/gim, '<u>$1</u>');
+    html = html.replace(/~~(.*?)~~/gim, '<del>$1</del>');
+    html = html.replace(/`(.*?)`/gim, '<code style="background:#222;padding:2px 4px;border-radius:4px;color:#e5ff00">$1</code>');
+    html = html.replace(/^\> (.*$)/gim, '<blockquote style="border-left:3px solid var(--accent);margin:0 0 10px 0;padding-left:10px;color:#aaa;">$1</blockquote>');
+    html = html.replace(/\\n/gim, '<br>');
+    return html;
+}
+
+document.getElementById('btnToggleMd')?.addEventListener('click', () => {
+    const editor = document.getElementById('editorText');
+    const preview = document.getElementById('editorPreview');
+    if (editor.style.display !== 'none') {
+        preview.innerHTML = parseMarkdown(editor.value);
+        editor.style.display = 'none';
+        preview.style.display = 'block';
+    } else {
+        editor.style.display = 'block';
+        preview.style.display = 'none';
     }
 });
 
