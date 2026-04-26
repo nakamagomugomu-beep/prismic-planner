@@ -560,18 +560,18 @@
 <div class="modal-overlay" id="calendarModal"><div class="modal" style="max-width:350px;">
     <h2 style="color:var(--text-primary); margin-bottom:16px; text-align:center;">Seleccionar Fecha</h2>
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <button class="btn btn-secondary" id="calPrevMonth" style="padding:8px 16px;">◀</button>
+        <button class="btn btn-secondary" id="calPrevMonth" style="padding:6px 12px; font-size:12px; min-width:unset; width:auto; height:auto;">◀</button>
         <div id="calMonthYear" style="font-family:'Oswald',sans-serif; font-weight:800; font-size:18px; color:var(--accent); text-transform:uppercase;"></div>
-        <button class="btn btn-secondary" id="calNextMonth" style="padding:8px 16px;">▶</button>
+        <button class="btn btn-secondary" id="calNextMonth" style="padding:6px 12px; font-size:12px; min-width:unset; width:auto; height:auto;">▶</button>
     </div>
     <div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; margin-bottom:8px; text-align:center;">
-        <div style="color:#666; font-size:12px; font-weight:bold;">Do</div>
         <div style="color:#666; font-size:12px; font-weight:bold;">Lu</div>
         <div style="color:#666; font-size:12px; font-weight:bold;">Ma</div>
         <div style="color:#666; font-size:12px; font-weight:bold;">Mi</div>
         <div style="color:#666; font-size:12px; font-weight:bold;">Ju</div>
         <div style="color:#666; font-size:12px; font-weight:bold;">Vi</div>
         <div style="color:#666; font-size:12px; font-weight:bold;">Sa</div>
+        <div style="color:#666; font-size:12px; font-weight:bold;">Do</div>
     </div>
     <div id="calGrid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:4px;"></div>
     <div class="modal-actions" style="margin-top:24px;">
@@ -821,7 +821,7 @@ function renderCalendar() {
     const year = calCurrentDate.getFullYear(), month = calCurrentDate.getMonth();
     const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     document.getElementById('calMonthYear').textContent = `${monthNames[month]} ${year}`;
-    const firstDay = new Date(year, month, 1).getDay();
+    const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const grid = document.getElementById('calGrid');
     grid.innerHTML = '';
