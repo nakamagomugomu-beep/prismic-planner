@@ -375,7 +375,7 @@
         <div class="sidebar-header"><svg class="logo-img" style="width:36px;height:36px;"><use href="#prismic-logo"/></svg><div class="sidebar-brand-text"><span>Prismic</span> Planner</div></div>
         <div class="sidebar-nav">
             <div class="nav-item active" data-page="planner"><span class="nav-icon">📋</span><div class="nav-text">PLANNER<span class="jp">プランナー</span></div></div>
-            <div class="nav-item" data-page="inbox"><span class="nav-icon">🧠</span><div class="nav-text">DESCARGA M.<span class="jp">ダウンロード</span></div></div>
+            <div class="nav-item" data-page="inbox"><span class="nav-icon">🧠</span><div class="nav-text">BLOC DE NOTAS<span class="jp">メモ帳</span></div></div>
             <div class="nav-item" data-page="schedule"><span class="nav-icon">📅</span><div class="nav-text">HORARIOS<span class="jp">スケジュール</span></div></div>
             <div class="nav-item" data-page="pomodoro"><span class="nav-icon">🍅</span><div class="nav-text">POMODORO<span class="jp">ポモドーロ</span></div></div>
             <div class="nav-item" data-page="gym"><span class="nav-icon">💪</span><div class="nav-text">GIMNASIO<span class="jp">ジム</span></div></div>
@@ -426,7 +426,6 @@
     <div class="note-editor-modal" id="noteEditor">
         <div class="editor-header">
             <button class="topbar-btn" id="btnCloseEditor" title="Volver">◀</button>
-            <input type="text" class="editor-title-input" id="editorTitle" placeholder="Título de la nota...">
             <div class="note-actions">
                 <button class="topbar-btn" id="btnDelNote" title="Eliminar" style="color:var(--danger)">✕</button>
             </div>
@@ -992,15 +991,19 @@ function renderInbox() {
 
     if (!state.inbox || typeof state.inbox === 'string' || !state.inbox.folders) {
         const old = typeof state.inbox === 'string' ? state.inbox : '';
-        state.inbox = { folders: [{id:'f_def', name:'General', notes: old ? [{id:'n_mig', title:'Nota migrada', content:old}] : []}], activeFolder:'f_def', activeNote:null };
+        state.inbox = { folders: [{id:'f_def', name:'Descarga Mental', notes: old ? [{id:'n_mig', title:'Nota migrada', content:old}] : []}], activeFolder:'f_def', activeNote:null };
+    }
+    if (state.inbox.folders.length > 0 && state.inbox.folders[0].name === 'General') {
+        state.inbox.folders[0].name = 'Descarga Mental';
     }
     if (!state.inbox.activeFolder && state.inbox.folders.length > 0) {
         state.inbox.activeFolder = state.inbox.folders[0].id;
     }
 
     // Render Folders
+    // Render Folders
     foldersContainer.innerHTML = state.inbox.folders.map(f => `
-        <div class="folder-chip ${f.id === state.inbox.activeFolder ? 'active' : ''}" data-folder="${f.id}">
+        <div class="folder-chip ${f.id === state.inbox.activeFolder ? 'active' : ''}" data-folder="${f.id}" oncontextmenu="editFolder('${f.id}'); return false;">
             📂 ${f.name}
         </div>
     `).join('') + `<div class="folder-chip add-btn" id="btnAddFolder">+ Nueva Carpeta</div>`;
@@ -1063,7 +1066,6 @@ function openNoteEditor(noteId) {
     const n = f.notes.find(n => n.id === noteId);
     state.inbox.activeNote = noteId;
     
-    document.getElementById('editorTitle').value = n.title;
     document.getElementById('editorText').value = n.content;
     document.getElementById('noteEditor').classList.add('active');
 }
@@ -1075,14 +1077,30 @@ function saveCurrentNote() {
         const f = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
         const n = f.notes.find(n => n.id === state.inbox.activeNote);
         if (n) {
-            n.title = document.getElementById('editorTitle').value;
             n.content = document.getElementById('editorText').value;
+            const lines = n.content.split('\\n').filter(l => l.trim().length > 0);
+            n.title = lines.length > 0 ? lines[0].replace(/^#+\\s*/, '') : 'Sin título';
             saveLocalState();
         }
     }, 500);
 }
 
-document.getElementById('editorTitle')?.addEventListener('input', saveCurrentNote);
+window.editFolder = function(id) {
+    const f = state.inbox.folders.find(x => x.id === id);
+    if (!f) return;
+    const newName = prompt('Renombrar carpeta (Dejá vacío para eliminar):', f.name);
+    if (newName === null) return;
+    if (newName.trim() === '') {
+        if (confirm('¿Seguro que querés ELIMINAR esta carpeta y TODAS sus notas?')) {
+            state.inbox.folders = state.inbox.folders.filter(x => x.id !== id);
+            if(state.inbox.activeFolder === id) state.inbox.activeFolder = state.inbox.folders.length ? state.inbox.folders[0].id : null;
+        }
+    } else {
+        f.name = newName.trim();
+    }
+    saveLocalState(); renderInbox();
+};
+
 document.getElementById('editorText')?.addEventListener('input', saveCurrentNote);
 document.getElementById('btnCloseEditor')?.addEventListener('click', () => {
     document.getElementById('noteEditor').classList.remove('active');
