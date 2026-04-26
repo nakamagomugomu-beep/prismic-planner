@@ -409,7 +409,7 @@
 
     <!-- INBOX / DESCARGA MENTAL -->
     <div class="page" id="pageInbox">
-        <div class="stats-row"><div class="stat-pill" style="grid-column: span 3; text-align:left; font-size:13px; font-weight:500; color:var(--text-secondary); text-transform:none; line-height:1.5;"><b>Descarga Mental (Mental Download)</b><br>Vaciá tu cabeza. Películas, libros, ideas locas. Dejalo acá para que no consuma tu RAM mental.</div></div>
+        <div class="stats-row"><div class="stat-pill" style="grid-column: span 3; text-align:left; font-size:13px; font-weight:500; color:var(--text-secondary); text-transform:none; line-height:1.5;"><b>No es una lista de quehaceres obligatorios.</b><br>Es un cajón libre para vaciar tu cabeza de la presión del día a día. Películas que te recomiendan, cosas que <i>"algún día querés estudiar"</i>, libros pendientes, pensamientos sueltos. Dejalo acá para que no consuma tu RAM mental.</div></div>
         
         <div class="notepad-container">
             <div class="notepad-sidebar" id="inboxFolders">
@@ -990,7 +990,13 @@ function renderInbox() {
     const notesGrid = document.getElementById('inboxNotesGrid');
     if (!foldersContainer || !notesGrid) return;
 
-    if (!state.inbox.folders) state.inbox = { folders: [{id:'f_def', name:'General', notes:[]}], activeFolder:'f_def', activeNote:null };
+    if (!state.inbox || typeof state.inbox === 'string' || !state.inbox.folders) {
+        const old = typeof state.inbox === 'string' ? state.inbox : '';
+        state.inbox = { folders: [{id:'f_def', name:'General', notes: old ? [{id:'n_mig', title:'Nota migrada', content:old}] : []}], activeFolder:'f_def', activeNote:null };
+    }
+    if (!state.inbox.activeFolder && state.inbox.folders.length > 0) {
+        state.inbox.activeFolder = state.inbox.folders[0].id;
+    }
 
     // Render Folders
     foldersContainer.innerHTML = state.inbox.folders.map(f => `
