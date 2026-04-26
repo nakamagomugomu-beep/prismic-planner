@@ -76,6 +76,12 @@
         .week-nav{display:flex;gap:4px;flex:1;border:none;overflow-x:auto;scrollbar-width:none;}
         .week-arrow{background:transparent;border:none;color:#aaa;font-size:18px;padding:0 8px;cursor:pointer;transition:color .15s;}
         .week-arrow:hover{color:#e5ff00;}
+        /* CALENDAR MODAL */
+        .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#ccc;font-weight:bold;cursor:pointer;font-size:14px;transition:var(--transition);}
+        .cal-day:hover:not(.empty){background:#333;border-color:var(--accent);color:#fff;}
+        .cal-day.active{background:var(--accent);color:#111;border-color:var(--accent);}
+        .cal-day.today{border-bottom:3px solid var(--accent);}
+        .cal-day.empty{background:transparent;border-color:transparent;cursor:default;}
         .day-btn{flex:1;min-width:54px;padding:12px 6px;background:transparent;border:none;border-radius:12px;color:#aaaaaa;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;cursor:pointer;transition:var(--transition);display:flex;flex-direction:column;align-items:center;gap:6px}
         .day-btn .day-num{font-size:18px;font-weight:800;color:#ffffff;font-family:'Oswald',sans-serif;}
         .day-btn.active{background:#e5ff00;color:#111111;box-shadow:0 4px 12px rgba(229,255,0,0.15)}
@@ -361,8 +367,7 @@
             <div class="week-nav" id="weekNav"></div>
             <button class="week-arrow btnNextWeek" title="Semana siguiente">▶</button>
             <div style="position:relative;display:flex;align-items:center;">
-               <button class="week-arrow" title="Elegir fecha">📅</button>
-               <input type="date" class="calendarPicker" style="position:absolute; opacity:0; right:0; top:0; width:100%; height:100%; cursor:pointer;">
+               <button class="week-arrow btnOpenCalendar" title="Elegir fecha">📅</button>
             </div>
         </div>
         <div class="stats-row"><div class="stat-pill"><div class="stat-val" id="statTotal">0</div><div class="stat-label">Total</div><div style="font-size:9px;color:#666;margin-top:2px">合計</div></div><div class="stat-pill"><div class="stat-val" id="statPending">0</div><div class="stat-label">Pendientes</div><div style="font-size:9px;color:#666;margin-top:2px">保留中</div></div><div class="stat-pill"><div class="stat-val" id="statDone">0</div><div class="stat-label">Hechas</div><div style="font-size:9px;color:#666;margin-top:2px">完了</div></div></div>
@@ -448,8 +453,7 @@
             <div class="week-nav" id="gymWeekNav"></div>
             <button class="week-arrow btnNextWeek" title="Semana siguiente">▶</button>
             <div style="position:relative;display:flex;align-items:center;">
-               <button class="week-arrow" title="Elegir fecha">📅</button>
-               <input type="date" class="calendarPicker" style="position:absolute; opacity:0; right:0; top:0; width:100%; height:100%; cursor:pointer;">
+               <button class="week-arrow btnOpenCalendar" title="Elegir fecha">📅</button>
             </div>
         </div>
         <div class="stats-row" style="grid-template-columns: 1fr;">
@@ -553,6 +557,28 @@
 </div></div>
 
 <!-- ALARMS & OVERLAYS -->
+<div class="modal-overlay" id="calendarModal"><div class="modal" style="max-width:350px;">
+    <h2 style="color:var(--text-primary); margin-bottom:16px; text-align:center;">Seleccionar Fecha</h2>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <button class="btn btn-secondary" id="calPrevMonth" style="padding:8px 16px;">◀</button>
+        <div id="calMonthYear" style="font-family:'Oswald',sans-serif; font-weight:800; font-size:18px; color:var(--accent); text-transform:uppercase;"></div>
+        <button class="btn btn-secondary" id="calNextMonth" style="padding:8px 16px;">▶</button>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(7, 1fr); gap:4px; margin-bottom:8px; text-align:center;">
+        <div style="color:#666; font-size:12px; font-weight:bold;">Do</div>
+        <div style="color:#666; font-size:12px; font-weight:bold;">Lu</div>
+        <div style="color:#666; font-size:12px; font-weight:bold;">Ma</div>
+        <div style="color:#666; font-size:12px; font-weight:bold;">Mi</div>
+        <div style="color:#666; font-size:12px; font-weight:bold;">Ju</div>
+        <div style="color:#666; font-size:12px; font-weight:bold;">Vi</div>
+        <div style="color:#666; font-size:12px; font-weight:bold;">Sa</div>
+    </div>
+    <div id="calGrid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:4px;"></div>
+    <div class="modal-actions" style="margin-top:24px;">
+        <button class="btn btn-secondary" style="width:100%;" onclick="document.getElementById('calendarModal').classList.remove('active')">Cerrar</button>
+    </div>
+</div></div>
+
 <div class="modal-overlay" id="alarmOverlay" style="z-index: 9999; display:none; flex-direction:column; background:rgba(10,10,15,0.95)">
     <div class="modal alarm-modal">
         <div class="alarm-icon">⏰</div>
@@ -785,12 +811,40 @@ document.querySelectorAll('.btnNextWeek').forEach(b=>b.addEventListener('click',
     state.selectedDate = d.toISOString().split('T')[0];
     render(); renderGym();
 }));
-document.querySelectorAll('.calendarPicker').forEach(inp=>inp.addEventListener('change', (e) => {
-    if(e.target.value) {
-        state.selectedDate = e.target.value;
-        render(); renderGym();
+let calCurrentDate = new Date();
+function openCalendarModal() {
+    calCurrentDate = new Date(state.selectedDate + 'T12:00:00');
+    renderCalendar();
+    document.getElementById('calendarModal').classList.add('active');
+}
+function renderCalendar() {
+    const year = calCurrentDate.getFullYear(), month = calCurrentDate.getMonth();
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    document.getElementById('calMonthYear').textContent = `${monthNames[month]} ${year}`;
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+    const todayStr = getTodayStr();
+    for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div class="cal-day empty"></div>`;
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dStr = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+        let classes = 'cal-day';
+        if (dStr === state.selectedDate) classes += ' active';
+        if (dStr === todayStr) classes += ' today';
+        grid.innerHTML += `<div class="cal-day ${classes}" data-date="${dStr}">${i}</div>`;
     }
-}));
+    grid.querySelectorAll('.cal-day:not(.empty)').forEach(btn => {
+        btn.addEventListener('click', () => {
+            state.selectedDate = btn.dataset.date;
+            document.getElementById('calendarModal').classList.remove('active');
+            render(); renderGym();
+        });
+    });
+}
+document.getElementById('calPrevMonth').addEventListener('click', () => { calCurrentDate.setMonth(calCurrentDate.getMonth() - 1); renderCalendar(); });
+document.getElementById('calNextMonth').addEventListener('click', () => { calCurrentDate.setMonth(calCurrentDate.getMonth() + 1); renderCalendar(); });
+document.querySelectorAll('.btnOpenCalendar').forEach(b=>b.addEventListener('click', openCalendarModal));
 
 function render(){
     const week=getWeekDates(state.selectedDate), today=getTodayStr();
