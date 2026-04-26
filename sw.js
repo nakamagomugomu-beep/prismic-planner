@@ -1,9 +1,10 @@
-const CACHE_NAME = 'prismic-v3.3';
+const CACHE_NAME = 'prismic-v3.4';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon.png'
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 self.addEventListener('install', e => {
