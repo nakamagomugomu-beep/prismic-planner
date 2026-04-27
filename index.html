@@ -162,11 +162,43 @@
         .note-card.add-note { border-style: dashed; background: transparent; justify-content: center; align-items: center; text-align: center; color: #444; }
         .note-card.add-note:hover { color: var(--accent); }
         
-        .note-editor-modal { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; }
+        .note-editor-modal { position: fixed; inset: 0; background: #0d0d0d; z-index: 1000; display: none; flex-direction: row; }
         .note-editor-modal.active { display: flex; }
-        .editor-header { padding: 16px; background: #111; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; }
-        .editor-title-input { background: transparent; border: none; color: #fff; font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; outline: none; flex: 1; }
-        .editor-textarea { flex: 1; background: #000; border: none; color: #eee; padding: 20px; font-size: 16px; line-height: 1.6; outline: none; resize: none; font-family: 'Inter', sans-serif; }
+        /* Editor sidebar (file tree) */
+        .editor-sidebar { width: 220px; min-width: 220px; background: #111; border-right: 1px solid #1e1e1e; display: flex; flex-direction: column; overflow: hidden; transition: width 0.2s; }
+        .editor-sidebar.collapsed { width: 0; min-width: 0; }
+        .editor-sidebar-header { padding: 12px 16px; border-bottom: 1px solid #1e1e1e; display: flex; align-items: center; justify-content: space-between; }
+        .editor-sidebar-title { font-size: 11px; font-weight: 800; color: #666; text-transform: uppercase; letter-spacing: 1.5px; }
+        .editor-file-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+        .editor-file-item { padding: 8px 16px; font-size: 13px; color: #888; cursor: pointer; display: flex; align-items: center; gap: 8px; border-left: 2px solid transparent; transition: var(--transition); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .editor-file-item:hover { color: #ccc; background: rgba(255,255,255,0.03); }
+        .editor-file-item.active { color: #fff; border-left-color: #e5ff00; background: rgba(229,255,0,0.05); }
+        .editor-file-item .file-icon { font-size: 12px; flex-shrink: 0; }
+        .editor-file-new { padding: 8px 16px; font-size: 12px; color: #444; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: var(--transition); border-top: 1px solid #1a1a1a; margin-top: auto; }
+        .editor-file-new:hover { color: #e5ff00; }
+        /* Editor main area */
+        .editor-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .editor-header { padding: 10px 16px; background: #111; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; gap: 12px; }
+        .editor-title-input { background: transparent; border: none; color: #fff; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; outline: none; flex: 1; color: #ccc; }
+        .editor-title-input::placeholder { color: #333; }
+        .editor-toolbar { display: flex; align-items: center; gap: 2px; padding: 6px 12px; background: #0d0d0d; border-bottom: 1px solid #1a1a1a; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+        .editor-toolbar::-webkit-scrollbar { display: none; }
+        .editor-tool { background: none; border: none; color: #555; font-size: 13px; padding: 5px 7px; border-radius: 5px; cursor: pointer; font-weight: 700; transition: var(--transition); white-space: nowrap; flex-shrink: 0; }
+        .editor-tool:hover { background: #1a1a1a; color: #ddd; }
+        .editor-tool.active { background: rgba(229,255,0,0.12); color: #e5ff00; }
+        .editor-tool-sep { width: 1px; height: 16px; background: #222; margin: 0 4px; flex-shrink: 0; }
+        .editor-view-group { display: flex; gap: 2px; padding: 3px; background: #1a1a1a; border-radius: 7px; flex-shrink: 0; }
+        .editor-view-btn { padding: 4px 10px; border: none; background: none; color: #555; font-size: 11px; font-weight: 800; border-radius: 5px; cursor: pointer; transition: var(--transition); text-transform: uppercase; letter-spacing: 0.5px; }
+        .editor-view-btn:hover { color: #ccc; }
+        .editor-view-btn.active { background: #2a2a2a; color: #e5ff00; }
+        /* Editor content */
+        .editor-split { display: flex; flex: 1; overflow: hidden; }
+        .editor-pane { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .editor-textarea { flex: 1; background: #0d0d0d; border: none; color: #d4d4d4; padding: 24px 32px; font-size: 15px; line-height: 1.8; outline: none; resize: none; font-family: 'Inter', sans-serif; caret-color: #e5ff00; }
+        .editor-textarea::placeholder { color: #2a2a2a; }
+        .editor-divider { width: 1px; background: #1e1e1e; cursor: col-resize; flex-shrink: 0; }
+        .editor-divider:hover { background: #e5ff00; }
+        .md-preview { padding: 24px 40px; font-size: 15px; line-height: 1.8; color: #ccc; font-family: 'Inter', sans-serif; background: #0d0d0d; overflow-y: auto; }
         
         .note-actions { display: flex; gap: 8px; }
         .note-del-btn { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; background: rgba(255,77,79,0.1); color: #ff4d4f; border: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; opacity: 0; transition: .2s; }
@@ -490,38 +522,60 @@
 
     <!-- FULL SCREEN NOTE EDITOR (Obsidian-like) -->
     <div class="note-editor-modal" id="noteEditor">
-        <div class="editor-header">
-            <button class="topbar-btn" id="btnCloseEditor" title="Volver">◀</button>
-            <input type="text" class="editor-title-input" id="editorTitle" placeholder="Título de la nota...">
-            <div class="note-actions">
-                <button class="editor-tool" id="btnToggleSource" title="Código fuente">SRC</button>
-                <button class="editor-tool" id="btnToggleSplit" title="Vista dividida">⬜⬜</button>
-                <button class="editor-tool" id="btnTogglePreview" title="Solo preview">👁</button>
-                <button class="topbar-btn" id="btnDelNote" title="Eliminar" style="color:var(--danger)">✕</button>
+        <!-- Sidebar: file tree -->
+        <div class="editor-sidebar" id="editorSidebar">
+            <div class="editor-sidebar-header">
+                <span class="editor-sidebar-title">Notas</span>
+                <button class="topbar-btn" id="btnCollapseEditorSidebar" title="Ocultar" style="font-size:14px;color:#555">◀</button>
             </div>
+            <div class="editor-file-list" id="editorFileList"></div>
+            <div class="editor-file-new" id="btnEditorNewNote">＋ Nueva nota</div>
         </div>
-        <div class="editor-toolbar">
-            <button class="editor-tool" data-insert="**" data-wrap="true" title="Negrita"><b>B</b></button>
-            <button class="editor-tool" data-insert="*" data-wrap="true" title="Itálica"><i>I</i></button>
-            <button class="editor-tool" data-insert="__" data-wrap="true" title="Subrayado"><u>U</u></button>
-            <button class="editor-tool" data-insert="~~" data-wrap="true" title="Tachado"><del>S</del></button>
-            <button class="editor-tool" data-insert="`" data-wrap="true" title="Código">` `</button>
-            <button class="editor-tool" data-insert="\n# " title="H1">H1</button>
-            <button class="editor-tool" data-insert="\n## " title="H2">H2</button>
-            <button class="editor-tool" data-insert="\n### " title="H3">H3</button>
-            <button class="editor-tool" data-insert="\n- " title="Lista">• —</button>
-            <button class="editor-tool" data-insert="\n- [ ] " title="Checkbox">☐</button>
-            <button class="editor-tool" data-insert="\n> " title="Cita">&gt;</button>
-            <button class="editor-tool" data-insert="\n---\n" title="Separador">—</button>
-            <button class="editor-tool" data-insert="\n```\n\n```" title="Bloque de código">&lt;/&gt;</button>
-            <button class="editor-tool" data-insert="\n>[!note]\n> " title="Callout">📝</button>
-        </div>
-        <div class="editor-split" id="editorSplitPane">
-            <div class="editor-pane">
-                <textarea class="editor-textarea" id="editorText" placeholder="Empezá a escribir en Markdown..."></textarea>
+        <!-- Main editor area -->
+        <div class="editor-main">
+            <div class="editor-header">
+                <button class="topbar-btn" id="btnToggleEditorSidebar" title="Sidebar" style="font-size:16px;color:#555">☰</button>
+                <input type="text" class="editor-title-input" id="editorTitle" placeholder="Sin título...">
+                <div style="display:flex;gap:8px;align-items:center">
+                    <button class="topbar-btn" id="btnDelNote" title="Eliminar nota" style="color:#444;font-size:16px">🗑</button>
+                    <button class="topbar-btn" id="btnCloseEditor" title="Cerrar editor" style="color:#fff;font-size:18px;font-weight:700">✕</button>
+                </div>
             </div>
-            <div class="editor-divider" id="editorDivider" style="display:none"></div>
-            <div class="editor-pane md-preview" id="editorPreview" style="display:none;"></div>
+            <div class="editor-toolbar">
+                <!-- View mode group (left) -->
+                <div class="editor-view-group">
+                    <button class="editor-view-btn active" id="btnToggleSource" title="Solo editor">SRC</button>
+                    <button class="editor-view-btn" id="btnToggleSplit" title="Editor + Preview">SPLIT</button>
+                    <button class="editor-view-btn" id="btnTogglePreview" title="Solo preview">PREV</button>
+                </div>
+                <div class="editor-tool-sep"></div>
+                <!-- Format tools -->
+                <button class="editor-tool" data-insert="**" data-wrap="true" title="Negrita"><b>B</b></button>
+                <button class="editor-tool" data-insert="*" data-wrap="true" title="Itálica"><i>I</i></button>
+                <button class="editor-tool" data-insert="~~" data-wrap="true" title="Tachado"><del>S</del></button>
+                <button class="editor-tool" data-insert="`" data-wrap="true" title="Código"><code style="color:#e5ff00">``</code></button>
+                <div class="editor-tool-sep"></div>
+                <button class="editor-tool" data-insert="\n# " title="H1">H1</button>
+                <button class="editor-tool" data-insert="\n## " title="H2">H2</button>
+                <button class="editor-tool" data-insert="\n### " title="H3">H3</button>
+                <div class="editor-tool-sep"></div>
+                <button class="editor-tool" data-insert="\n- " title="Lista">• —</button>
+                <button class="editor-tool" data-insert="\n- [ ] " title="Checkbox">☐</button>
+                <button class="editor-tool" data-insert="\n1. " title="Lista numerada">1.</button>
+                <div class="editor-tool-sep"></div>
+                <button class="editor-tool" data-insert="\n> " title="Cita">&gt;</button>
+                <button class="editor-tool" data-insert="\n---\n" title="Separador">—</button>
+                <button class="editor-tool" data-insert="\n```\n\n```" title="Código"></>  </button>
+                <button class="editor-tool" data-insert="\n>[!note]\n> " title="Callout Nota" style="color:#60a5fa">📋</button>
+                <button class="editor-tool" data-insert="\n>[!warning]\n> " title="Callout Aviso" style="color:#ffaa00">⚠</button>
+            </div>
+            <div class="editor-split" id="editorSplitPane">
+                <div class="editor-pane" id="editorSourcePane">
+                    <textarea class="editor-textarea" id="editorText" placeholder="Empezá a escribir en Markdown..."></textarea>
+                </div>
+                <div class="editor-divider" id="editorDivider" style="display:none"></div>
+                <div class="editor-pane md-preview" id="editorPreview" style="display:none;"></div>
+            </div>
         </div>
     </div>
 
@@ -1212,14 +1266,24 @@ function renderInbox() {
 
 function openNoteEditor(noteId) {
     const f = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
-    const n = f.notes.find(n => n.id === noteId);
+    const n = f ? f.notes.find(n => n.id === noteId) : null;
+    if (!n) return;
     state.inbox.activeNote = noteId;
-    
-    document.getElementById('editorTitle').value = n.title;
-    document.getElementById('editorText').value = n.content;
+    document.getElementById('editorTitle').value = n.title || '';
+    document.getElementById('editorText').value = n.content || '';
     document.getElementById('noteEditor').classList.add('active');
-    document.getElementById('editorPreview').style.display = 'none';
-    document.getElementById('editorText').style.display = 'block';
+    setEditorMode('source');
+    renderEditorFileList();
+    document.getElementById('editorText').focus();
+}
+function renderEditorFileList() {
+    const list = document.getElementById('editorFileList'); if (!list) return;
+    const f = state.inbox.folders.find(x => x.id === state.inbox.activeFolder);
+    if (!f) { list.innerHTML = ''; return; }
+    list.innerHTML = f.notes.map(n => `<div class="editor-file-item ${n.id===state.inbox.activeNote?'active':''}" data-edfile="${n.id}"><span class="file-icon">📄</span><span style="overflow:hidden;text-overflow:ellipsis">${n.title||'Sin título'}</span></div>`).join('');
+    list.querySelectorAll('[data-edfile]').forEach(el => el.addEventListener('click', () => {
+        if (state.inbox.activeNote !== el.dataset.edfile) openNoteEditor(el.dataset.edfile);
+    }));
 }
 
 let noteSaveTO;
@@ -1291,6 +1355,19 @@ document.getElementById('btnCloseEditor')?.addEventListener('click', () => {
     document.getElementById('noteEditor').classList.remove('active');
     renderInbox();
 });
+document.getElementById('btnToggleEditorSidebar')?.addEventListener('click', () => {
+    document.getElementById('editorSidebar').classList.toggle('collapsed');
+});
+document.getElementById('btnCollapseEditorSidebar')?.addEventListener('click', () => {
+    document.getElementById('editorSidebar').classList.add('collapsed');
+});
+document.getElementById('btnEditorNewNote')?.addEventListener('click', () => {
+    const f = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
+    if (!f) return;
+    const newNote = { id: 'n_' + Date.now(), title: '', content: '' };
+    f.notes.push(newNote); saveLocalState();
+    openNoteEditor(newNote.id);
+});
 document.getElementById('btnDelNote')?.addEventListener('click', () => {
     if (confirm('¿Eliminar esta nota?')) {
         const f = state.inbox.folders.find(f => f.id === state.inbox.activeFolder);
@@ -1304,27 +1381,33 @@ document.getElementById('btnDelNote')?.addEventListener('click', () => {
 // ============================================
 // OBSIDIAN-LIKE MARKDOWN EDITOR
 // ============================================
-let editorMode = 'source'; // 'source' | 'split' | 'preview'
+let editorMode = 'source';
 function setEditorMode(mode) {
     editorMode = mode;
-    const textarea = document.getElementById('editorText');
+    const srcPane = document.getElementById('editorSourcePane');
     const preview = document.getElementById('editorPreview');
     const divider = document.getElementById('editorDivider');
     const btnSrc = document.getElementById('btnToggleSource');
     const btnSplit = document.getElementById('btnToggleSplit');
     const btnPrev = document.getElementById('btnTogglePreview');
-    [btnSrc, btnSplit, btnPrev].forEach(b=>b&&b.classList.remove('active'));
+    [btnSrc, btnSplit, btnPrev].forEach(b => b && b.classList.remove('active'));
     if (mode === 'source') {
-        textarea.parentElement.style.display='flex'; preview.style.display='none'; divider.style.display='none';
-        btnSrc&&btnSrc.classList.add('active');
+        if(srcPane) srcPane.style.display = 'flex';
+        if(preview) preview.style.display = 'none';
+        if(divider) divider.style.display = 'none';
+        btnSrc && btnSrc.classList.add('active');
     } else if (mode === 'split') {
-        textarea.parentElement.style.display='flex'; preview.style.display='flex'; divider.style.display='block';
+        if(srcPane) srcPane.style.display = 'flex';
+        if(preview) { preview.style.display = 'flex'; preview.style.flex = '1'; }
+        if(divider) divider.style.display = 'block';
         updatePreview();
-        btnSplit&&btnSplit.classList.add('active');
+        btnSplit && btnSplit.classList.add('active');
     } else {
-        textarea.parentElement.style.display='none'; preview.style.display='flex'; divider.style.display='none';
+        if(srcPane) srcPane.style.display = 'none';
+        if(preview) { preview.style.display = 'flex'; preview.style.flex = '1'; }
+        if(divider) divider.style.display = 'none';
         updatePreview();
-        btnPrev&&btnPrev.classList.add('active');
+        btnPrev && btnPrev.classList.add('active');
     }
 }
 function updatePreview() {
