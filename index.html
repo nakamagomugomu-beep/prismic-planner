@@ -282,6 +282,8 @@
         .modal h2{font-size:22px;font-weight:800;margin-bottom:24px;color:var(--accent)}
         .input-group{margin-bottom:20px}
         .input-group label{display:block;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+        .form-input{width:100%;padding:12px 16px;background:#111;border:1px solid #333;border-radius:8px;color:#fff;font-family:inherit;font-size:15px;outline:none;transition:var(--transition)}
+        .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(229,255,0,0.15)}
         .tag-selector{display:flex;gap:10px;flex-wrap:wrap}
         .tag-option{padding:10px 16px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--bg-primary);color:var(--text-secondary);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:6px}
         .tag-option:hover{border-color:var(--accent-glow)}
@@ -440,14 +442,15 @@
     <!-- FOLDER MODAL -->
     <div class="modal-overlay" id="folderModal" style="display:none; z-index:1100; flex-direction:column; align-items:center; justify-content:center; background:rgba(10,10,15,0.95)">
         <div class="modal" style="width:100%; max-width:400px; padding:24px;">
-            <div class="modal-title" style="margin-bottom:20px;">Opciones de Carpeta</div>
+            <h2>Opciones de Carpeta</h2>
             <div class="input-group">
                 <label>NOMBRE</label>
-                <input type="text" id="folderEditName" class="form-input">
+                <input type="text" id="folderEditName" class="form-input" autocomplete="off">
             </div>
             <div class="input-group" style="margin-top:16px;">
                 <label>COLOR (Borde/Fondo activo)</label>
                 <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;" id="folderColorPicker">
+                    <button class="tag-option" data-color="" style="background:transparent; border-style:dashed; color:#aaa;">Sin Color</button>
                     <button class="tag-option selected" data-color="#e5ff00" style="background:rgba(229,255,0,0.1); border-color:#e5ff00; color:#e5ff00;">Amarillo</button>
                     <button class="tag-option" data-color="#00f0ff" style="background:rgba(0,240,255,0.1); border-color:#00f0ff; color:#00f0ff;">Cian</button>
                     <button class="tag-option" data-color="#ff0055" style="background:rgba(255,0,85,0.1); border-color:#ff0055; color:#ff0055;">Carmín</button>
