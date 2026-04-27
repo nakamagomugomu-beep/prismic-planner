@@ -505,14 +505,7 @@
     <!-- POMODORO -->
     <div class="page" id="pagePomodoro">
         <div class="pomo-container">
-            <div class="pomo-modes">
-                <button class="pomo-mode active" data-mode="work">💼 Trabajo</button>
-                <button class="pomo-mode" data-mode="short">☕ Descanso</button>
-                <button class="pomo-mode" data-mode="long">🌴 Largo</button>
-                <button class="pomo-mode" data-mode="exercise">🏋️ Ejercicio</button>
-                <button class="pomo-mode" data-mode="gaming">🎮 Gaming</button>
-                <button class="pomo-mode" data-mode="custom">⚙️ Custom</button>
-            </div>
+            <div class="pomo-modes" id="pomoModesContainer"></div>
             <div class="pomo-ring">
                 <svg viewBox="0 0 200 200"><circle class="ring-bg" cx="100" cy="100" r="90"/><circle class="ring-progress" id="pomoRing" cx="100" cy="100" r="90" stroke-dasharray="565.48" stroke-dashoffset="0"/></svg>
                 <div class="pomo-time"><div class="time-display" id="pomoTime" title="Tocar para editar tiempo">25:00</div><div class="time-label" id="pomoLabel">Trabajo</div></div>
@@ -529,12 +522,7 @@
 
             <div class="setting-group" style="width:100%; max-width:400px; margin-top:32px; background:transparent; border:none; box-shadow:none; padding:0;">
                 <h3 style="margin-bottom:12px; color:var(--text-primary)">⏳ Tiempos (Minutos)</h3>
-                <div class="pomo-setting-row"><div class="setting-label">💼 Trabajo</div><input class="setting-input pomo-setting" id="setWorkMin" type="number" min="1" max="120" value="25" style="width:80px; text-align:center; margin-top:0"></div>
-                <div class="pomo-setting-row"><div class="setting-label">☕ Descanso</div><input class="setting-input pomo-setting" id="setShortMin" type="number" min="1" max="60" value="5" style="width:80px; text-align:center; margin-top:0"></div>
-                <div class="pomo-setting-row"><div class="setting-label">🌴 Descanso Largo</div><input class="setting-input pomo-setting" id="setLongMin" type="number" min="1" max="120" value="15" style="width:80px; text-align:center; margin-top:0"></div>
-                <div class="pomo-setting-row"><div class="setting-label">🏋️ Ejercicio</div><input class="setting-input pomo-setting" id="setExerciseMin" type="number" min="1" max="240" value="45" style="width:80px; text-align:center; margin-top:0"></div>
-                <div class="pomo-setting-row"><div class="setting-label">🎮 Gaming</div><input class="setting-input pomo-setting" id="setGamingMin" type="number" min="1" max="300" value="60" style="width:80px; text-align:center; margin-top:0"></div>
-                <div class="pomo-setting-row" style="border:none"><div class="setting-label">⚙️ Custom</div><input class="setting-input pomo-setting" id="setCustomMin" type="number" min="1" max="999" value="30" style="width:80px; text-align:center; margin-top:0"></div>
+                <div id="pomoSettingsList"></div>
             </div>
         </div>
     </div>
@@ -638,6 +626,14 @@
 <div class="modal-overlay" id="pomoEditModal"><div class="modal"><h2 style="color:var(--text-primary)">Ajustar Tiempo Actual</h2>
     <div class="input-group"><label>Minutos</label><input class="setting-input" type="number" id="pomoEditMin" min="1" max="999" value="25" style="text-align:center; font-size:24px; font-weight:800;"></div>
     <div class="modal-actions"><button class="btn btn-secondary" onclick="document.getElementById('pomoEditModal').classList.remove('active')">Cancelar</button><button class="btn btn-primary" id="btnSavePomoEdit">Aplicar</button></div>
+</div></div>
+
+<!-- CREATE POMODORO MODAL -->
+<div class="modal-overlay" id="pomoCreateModal"><div class="modal"><h2 style="color:var(--text-primary)">Nuevo Pomodoro</h2>
+    <div class="input-group"><label>Nombre</label><input class="setting-input" type="text" id="newPomoName" placeholder="Ej: Lectura" autocomplete="off"></div>
+    <div class="input-group"><label>Icono (Emoji)</label><input class="setting-input" type="text" id="newPomoIcon" placeholder="Ej: 📖" style="width:80px"></div>
+    <div class="input-group"><label>Minutos</label><input class="setting-input" type="number" id="newPomoTime" min="1" max="999" value="25" style="width:80px"></div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="document.getElementById('pomoCreateModal').classList.remove('active')">Cancelar</button><button class="btn btn-primary" id="btnSaveNewPomo">Crear</button></div>
 </div></div>
 
 <!-- GYM EXERCISE MODAL -->
@@ -881,7 +877,7 @@ document.querySelectorAll('.nav-item').forEach(item=>{
         item.classList.add('active');
         document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
         document.getElementById('page'+pg.charAt(0).toUpperCase()+pg.slice(1)).classList.add('active');
-        document.getElementById('fabAdd').style.display=pg==='planner'?'flex':'none';
+        document.getElementById('fabAdd').style.display=(pg==='planner'||pg==='pomodoro')?'flex':'none';
         closeSidebar();
         if(pg==='gym') renderGym();
         if(pg==='schedule') renderSchedule();
@@ -1223,7 +1219,18 @@ function escapeHtml(t){if(!t)return ''; const n=document.createElement('div');n.
 
 function renderCatSelector(){document.getElementById('tagSelector').innerHTML=getAllCats().map((c,i)=>`<button class="tag-option ${i===0?'selected':''}" data-tag="${c.id}">${c.icon} ${c.name}</button>`).join('')}
 const mOverlay=document.getElementById('modalOverlay'),tInput=document.getElementById('taskInput'),tTime=document.getElementById('taskTime');let selTag='work';
-document.getElementById('fabAdd').addEventListener('click',()=>{editingTaskIdx=-1;pendingSubtasks=[];document.getElementById('modalTitle').textContent='Nueva Meta';openTaskModal('','','work',[])});
+document.getElementById('fabAdd').addEventListener('click',()=>{
+    const activePage = document.querySelector('.nav-item.active').dataset.page;
+    if (activePage === 'pomodoro') {
+        document.getElementById('pomoCreateModal').classList.add('active');
+        document.getElementById('newPomoName').value='';
+        document.getElementById('newPomoIcon').value='';
+        document.getElementById('newPomoTime').value='25';
+        setTimeout(()=>document.getElementById('newPomoName').focus(),300);
+    } else {
+        editingTaskIdx=-1;pendingSubtasks=[];document.getElementById('modalTitle').textContent='Nueva Meta';openTaskModal('','','work',[])
+    }
+});
 let pendingSubtasks=[];
 function renderSubtaskModalList(){
     const container=document.getElementById('subtaskModalList');
@@ -1389,20 +1396,46 @@ function renderScheduleStats() {
 // POMODORO (Robusto Background)
 // ============================================
 const pLabels={work:'Trabajo',short:'Descanso',long:'🌴 Largo',exercise:'Ejercicio',gaming:'Gaming',custom:'Custom'};
+function renderPomoModes(){
+    const container=document.getElementById('pomoModesContainer');
+    const customPomos=JSON.parse(localStorage.getItem('prismic_custom_pomos')||'[]');
+    let html=`<button class="pomo-mode" data-mode="work">💼 Trabajo</button><button class="pomo-mode" data-mode="short">☕ Descanso</button><button class="pomo-mode" data-mode="long">🌴 Largo</button><button class="pomo-mode" data-mode="exercise">🏋️ Ejercicio</button><button class="pomo-mode" data-mode="gaming">🎮 Gaming</button><button class="pomo-mode" data-mode="custom">⚙️ Custom</button>`;
+    customPomos.forEach(cp=>{html+=`<button class="pomo-mode" data-mode="${cp.id}">${cp.icon} ${escapeHtml(cp.name)}</button>`;pLabels[cp.id]=cp.name;});
+    container.innerHTML=html;
+    container.querySelectorAll('.pomo-mode').forEach(b=>{
+        b.classList.toggle('active',b.dataset.mode===pomoState.mode);
+        b.addEventListener('click',()=>setPomoMode(b.dataset.mode));
+    });
+}
+function renderPomoSettingsList(){
+    const container=document.getElementById('pomoSettingsList');if(!container)return;
+    const defaults=[{id:'work',icon:'💼',name:'Trabajo'},{id:'short',icon:'☕',name:'Descanso'},{id:'long',icon:'🌴',name:'Descanso Largo'},{id:'exercise',icon:'🏋️',name:'Ejercicio'},{id:'gaming',icon:'🎮',name:'Gaming'},{id:'custom',icon:'⚙️',name:'Custom'}];
+    const customPomos=JSON.parse(localStorage.getItem('prismic_custom_pomos')||'[]');
+    let html='';
+    defaults.forEach(d=>{html+=`<div class="pomo-setting-row"><div class="setting-label">${d.icon} ${d.name}</div><input class="setting-input pomo-setting" data-pomoset="${d.id}" type="number" min="1" max="999" value="${pomoSettings[d.id]||30}" style="width:80px; text-align:center; margin-top:0"></div>`;});
+    customPomos.forEach((cp,idx)=>{html+=`<div class="pomo-setting-row"><div class="setting-label">${cp.icon} ${escapeHtml(cp.name)}</div><div style="display:flex;gap:8px;align-items:center"><input class="setting-input pomo-setting" data-pomoset="${cp.id}" type="number" min="1" max="999" value="${pomoSettings[cp.id]||cp.time}" style="width:80px; text-align:center; margin-top:0"><button class="task-action-btn task-del-btn" style="position:static;opacity:1;width:32px;height:32px" data-del-pomo="${idx}">✕</button></div></div>`;});
+    container.innerHTML=html;
+    container.querySelectorAll('.pomo-setting').forEach(el=>{
+        el.addEventListener('change',(e)=>{
+            let v=parseInt(e.target.value);if(isNaN(v)||v<1)v=25;
+            pomoSettings[el.dataset.pomoset]=v;localStorage.setItem(POMO_SETTINGS_KEY,JSON.stringify(pomoSettings));
+            if(pomoState.mode===el.dataset.pomoset){pomoState.timeLeft=v*60;renderPomo();}
+        });
+    });
+    container.querySelectorAll('[data-del-pomo]').forEach(btn=>{
+        btn.addEventListener('click',(e)=>{
+            const idx=+e.currentTarget.dataset.delPomo;
+            const cp=customPomos[idx];customPomos.splice(idx,1);
+            localStorage.setItem('prismic_custom_pomos',JSON.stringify(customPomos));
+            if(pomoState.mode===cp.id)setPomoMode('work');
+            renderPomoModes();renderPomoSettingsList();
+        });
+    });
+}
 function loadPomoSettings(){
     try{const s=localStorage.getItem(POMO_SETTINGS_KEY);if(s)pomoSettings=JSON.parse(s)}catch(e){}
-    ['work','short','long','exercise','gaming','custom'].forEach(k=>{
-        const el=document.getElementById('set'+k.charAt(0).toUpperCase()+k.slice(1)+'Min');
-        if(el){
-            el.value=pomoSettings[k]||30;
-            el.addEventListener('change', (e) => {
-                let v = parseInt(e.target.value); if(isNaN(v)||v<1) v=25;
-                pomoSettings[k] = v; localStorage.setItem(POMO_SETTINGS_KEY, JSON.stringify(pomoSettings));
-                if(pomoState.mode === k) { pomoState.timeLeft = v * 60; renderPomo(); }
-            });
-        }
-    });
-    try { const ps = localStorage.getItem(POMO_STATE_KEY); if(ps) { const p = JSON.parse(ps); pomoState.completed = p.completed || 0; pomoState.totalSeconds = p.totalSeconds || 0; } } catch(e){}
+    try{const ps=localStorage.getItem(POMO_STATE_KEY);if(ps){const p=JSON.parse(ps);pomoState.completed=p.completed||0;pomoState.totalSeconds=p.totalSeconds||0;}}catch(e){}
+    renderPomoModes(); renderPomoSettingsList();
     pomoState.timeLeft=(pomoSettings[pomoState.mode]||25)*60;
     renderPomo();
 }
@@ -1438,11 +1471,23 @@ function pomoComplete(){
     startAudioAlarm('¡Tiempo Terminado!', `El ciclo de ${pLabels[pomoState.mode]} ha finalizado.`);
     const nxt=pomoState.mode==='work'?(pomoState.completed%4===0?'long':'short'):'work'; setPomoMode(nxt);
 }
-function setPomoMode(m){pomoState.mode=m;pomoState.timeLeft=(pomoSettings[m]||25)*60;stopPomo();document.querySelectorAll('.pomo-mode').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));renderPomo()}
+function setPomoMode(m){pomoState.mode=m;pomoState.timeLeft=(pomoSettings[m]||25)*60;stopPomo();renderPomoModes();renderPomo()}
 document.getElementById('pomoToggle').addEventListener('click',()=>{if(pomoState.running)stopPomo();else startPomo()});
 document.getElementById('pomoReset').addEventListener('click',()=>setPomoMode(pomoState.mode));
 document.getElementById('pomoSkip').addEventListener('click',pomoComplete);
-document.querySelectorAll('.pomo-mode').forEach(b=>b.addEventListener('click',()=>setPomoMode(b.dataset.mode)));
+
+document.getElementById('btnSaveNewPomo').addEventListener('click',()=>{
+    const name=document.getElementById('newPomoName').value.trim();if(!name)return;
+    const icon=document.getElementById('newPomoIcon').value.trim()||'⏳';
+    const time=parseInt(document.getElementById('newPomoTime').value)||25;
+    const id='cp_'+Date.now();
+    let customPomos=JSON.parse(localStorage.getItem('prismic_custom_pomos')||'[]');
+    customPomos.push({id,name,icon,time});
+    localStorage.setItem('prismic_custom_pomos',JSON.stringify(customPomos));
+    pomoSettings[id]=time;localStorage.setItem(POMO_SETTINGS_KEY,JSON.stringify(pomoSettings));
+    document.getElementById('pomoCreateModal').classList.remove('active');
+    renderPomoModes();renderPomoSettingsList();setPomoMode(id);
+});
 
 // Pomo time manual edit
 document.getElementById('pomoTime').addEventListener('click',()=>{document.getElementById('pomoEditModal').classList.add('active');document.getElementById('pomoEditMin').value=Math.floor(pomoState.timeLeft/60)});
