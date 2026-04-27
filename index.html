@@ -526,6 +526,16 @@
                 <div class="stat-pill"><div class="stat-val" id="pomoCount">0</div><div class="stat-label">Completados</div></div>
                 <div class="stat-pill" style="grid-column: span 2"><div class="stat-val" id="pomoTotal">0h 0m</div><div class="stat-label">Tiempo Total Activo</div></div>
             </div>
+
+            <div class="setting-group" style="width:100%; max-width:400px; margin-top:32px; background:transparent; border:none; box-shadow:none; padding:0;">
+                <h3 style="margin-bottom:12px; color:var(--text-primary)">⏳ Tiempos (Minutos)</h3>
+                <div class="pomo-setting-row"><div class="setting-label">💼 Trabajo</div><input class="setting-input pomo-setting" id="setWorkMin" type="number" min="1" max="120" value="25" style="width:80px; text-align:center; margin-top:0"></div>
+                <div class="pomo-setting-row"><div class="setting-label">☕ Descanso</div><input class="setting-input pomo-setting" id="setShortMin" type="number" min="1" max="60" value="5" style="width:80px; text-align:center; margin-top:0"></div>
+                <div class="pomo-setting-row"><div class="setting-label">🌴 Descanso Largo</div><input class="setting-input pomo-setting" id="setLongMin" type="number" min="1" max="120" value="15" style="width:80px; text-align:center; margin-top:0"></div>
+                <div class="pomo-setting-row"><div class="setting-label">🏋️ Ejercicio</div><input class="setting-input pomo-setting" id="setExerciseMin" type="number" min="1" max="240" value="45" style="width:80px; text-align:center; margin-top:0"></div>
+                <div class="pomo-setting-row"><div class="setting-label">🎮 Gaming</div><input class="setting-input pomo-setting" id="setGamingMin" type="number" min="1" max="300" value="60" style="width:80px; text-align:center; margin-top:0"></div>
+                <div class="pomo-setting-row" style="border:none"><div class="setting-label">⚙️ Custom</div><input class="setting-input pomo-setting" id="setCustomMin" type="number" min="1" max="999" value="30" style="width:80px; text-align:center; margin-top:0"></div>
+            </div>
         </div>
     </div>
 
@@ -602,14 +612,6 @@
             <div class="custom-cat-row"><input class="setting-input" id="newCatIcon" placeholder="Emj" style="width:64px; text-align:center; padding:12px 0; margin-top:0"><input class="setting-input" id="newCatName" placeholder="Nombre de categoría" style="margin-top:0"><button class="btn btn-primary" id="btnAddCat" style="width:48px; flex:none; padding:12px 0;">+</button></div>
         </div>
 
-        <div class="setting-group">
-            <h3>⏳ Tiempos Pomodoro</h3>
-            <div class="pomo-setting-row"><div class="setting-label">💼 Trabajo</div><input class="setting-input pomo-setting" id="setWorkMin" type="number" min="1" max="120" value="25" style="width:80px; text-align:center; margin-top:0"></div>
-            <div class="pomo-setting-row"><div class="setting-label">☕ Descanso</div><input class="setting-input pomo-setting" id="setShortMin" type="number" min="1" max="60" value="5" style="width:80px; text-align:center; margin-top:0"></div>
-            <div class="pomo-setting-row"><div class="setting-label">🌴 Descanso Largo</div><input class="setting-input pomo-setting" id="setLongMin" type="number" min="1" max="120" value="15" style="width:80px; text-align:center; margin-top:0"></div>
-            <div class="pomo-setting-row"><div class="setting-label">🏋️ Ejercicio</div><input class="setting-input pomo-setting" id="setExerciseMin" type="number" min="1" max="240" value="45" style="width:80px; text-align:center; margin-top:0"></div>
-            <div class="pomo-setting-row"><div class="setting-label">🎮 Gaming</div><input class="setting-input pomo-setting" id="setGamingMin" type="number" min="1" max="300" value="60" style="width:80px; text-align:center; margin-top:0"></div>
-            <div class="pomo-setting-row" style="border:none"><div class="setting-label">⚙️ Custom</div><input class="setting-input pomo-setting" id="setCustomMin" type="number" min="1" max="999" value="30" style="width:80px; text-align:center; margin-top:0"></div>
         </div>
     </div>
     
@@ -686,7 +688,7 @@
 // ============================================
 // SYSTEM & CONFIG
 // ============================================
-const STORAGE_KEY='prismic_planner_data_v3',SYNC_URL_KEY='prismic_sync_url',PIN_HASH_KEY='prismic_pin_hash',SECURITY_Q_KEY='prismic_security_q',SECURITY_A_KEY='prismic_security_a',SESSION_KEY='prismic_session',THEME_KEY='prismic_theme',REMEMBER_KEY='prismic_remember',POMO_SETTINGS_KEY='prismic_pomo_settings_v3',CUSTOM_CATS_KEY='prismic_custom_cats',GYM_KEY='prismic_gym_data_v3',CIRC=2*Math.PI*90;
+const STORAGE_KEY='prismic_planner_data_v3',SYNC_URL_KEY='prismic_sync_url',PIN_HASH_KEY='prismic_pin_hash',SECURITY_Q_KEY='prismic_security_q',SECURITY_A_KEY='prismic_security_a',SESSION_KEY='prismic_session',THEME_KEY='prismic_theme',REMEMBER_KEY='prismic_remember',POMO_SETTINGS_KEY='prismic_pomo_settings_v3',POMO_STATE_KEY='prismic_pomo_state_v3',CUSTOM_CATS_KEY='prismic_custom_cats',GYM_KEY='prismic_gym_data_v3',CIRC=2*Math.PI*90;
 const defaultCats=[{id:'work',icon:'💼',name:'Trabajo'},{id:'personal',icon:'🏠',name:'Personal'},{id:'study',icon:'📚',name:'Estudio'},{id:'urgent',icon:'🔥',name:'Urgente'},{id:'project',icon:'🚀',name:'Proyecto'},{id:'gaming',icon:'🎮',name:'Juego'}];
 
 function getAllCats(){const custom=JSON.parse(localStorage.getItem(CUSTOM_CATS_KEY)||'[]');return[...defaultCats,...custom]}
@@ -1387,7 +1389,24 @@ function renderScheduleStats() {
 // POMODORO (Robusto Background)
 // ============================================
 const pLabels={work:'Trabajo',short:'Descanso',long:'🌴 Largo',exercise:'Ejercicio',gaming:'Gaming',custom:'Custom'};
-function loadPomoSettings(){try{const s=localStorage.getItem(POMO_SETTINGS_KEY);if(s)pomoSettings=JSON.parse(s)}catch(e){}['work','short','long','exercise','gaming','custom'].forEach(k=>{const el=document.getElementById('set'+k.charAt(0).toUpperCase()+k.slice(1)+'Min');if(el)el.value=pomoSettings[k]||30});pomoState.timeLeft=(pomoSettings[pomoState.mode]||25)*60;renderPomo()}
+function loadPomoSettings(){
+    try{const s=localStorage.getItem(POMO_SETTINGS_KEY);if(s)pomoSettings=JSON.parse(s)}catch(e){}
+    ['work','short','long','exercise','gaming','custom'].forEach(k=>{
+        const el=document.getElementById('set'+k.charAt(0).toUpperCase()+k.slice(1)+'Min');
+        if(el){
+            el.value=pomoSettings[k]||30;
+            el.addEventListener('change', (e) => {
+                let v = parseInt(e.target.value); if(isNaN(v)||v<1) v=25;
+                pomoSettings[k] = v; localStorage.setItem(POMO_SETTINGS_KEY, JSON.stringify(pomoSettings));
+                if(pomoState.mode === k) { pomoState.timeLeft = v * 60; renderPomo(); }
+            });
+        }
+    });
+    try { const ps = localStorage.getItem(POMO_STATE_KEY); if(ps) { const p = JSON.parse(ps); pomoState.completed = p.completed || 0; pomoState.totalSeconds = p.totalSeconds || 0; } } catch(e){}
+    pomoState.timeLeft=(pomoSettings[pomoState.mode]||25)*60;
+    renderPomo();
+}
+function savePomoStats() { localStorage.setItem(POMO_STATE_KEY, JSON.stringify({completed: pomoState.completed, totalSeconds: pomoState.totalSeconds})); }
 function renderPomo(){
     const tot=(pomoSettings[pomoState.mode]||25)*60, l=pomoState.timeLeft;
     document.getElementById('pomoTime').textContent=`${String(Math.floor(l/60)).padStart(2,'0')}:${String(l%60).padStart(2,'0')}`;
@@ -1399,16 +1418,23 @@ function renderPomo(){
 }
 function startPomo(){
     pomoState.running=true; pomoState.targetTime=Date.now() + pomoState.timeLeft*1000;
+    let lastTick = Date.now();
     clearInterval(pomoState.interval);
     pomoState.interval=setInterval(()=>{
-        pomoState.timeLeft=Math.max(0,Math.floor((pomoState.targetTime-Date.now())/1000));
-        if(pomoState.mode==='work'||pomoState.mode==='exercise'||pomoState.mode==='custom'||pomoState.mode==='gaming') pomoState.totalSeconds++;
+        const now = Date.now();
+        pomoState.timeLeft=Math.max(0,Math.floor((pomoState.targetTime-now)/1000));
+        if(pomoState.mode==='work'||pomoState.mode==='exercise'||pomoState.mode==='custom'||pomoState.mode==='gaming') {
+            const diff = (now - lastTick) / 1000;
+            pomoState.totalSeconds += diff;
+        }
+        lastTick = now;
+        savePomoStats();
         if(pomoState.timeLeft<=0) pomoComplete(); else renderPomo();
-    }, 500); renderPomo();
+    }, 1000); renderPomo();
 }
-function stopPomo(){pomoState.running=false;clearInterval(pomoState.interval);renderPomo()}
+function stopPomo(){pomoState.running=false;clearInterval(pomoState.interval);savePomoStats();renderPomo()}
 function pomoComplete(){
-    stopPomo(); if(['work','exercise','gaming','custom'].includes(pomoState.mode)) pomoState.completed++;
+    stopPomo(); if(['work','exercise','gaming','custom'].includes(pomoState.mode)) { pomoState.completed++; savePomoStats(); }
     startAudioAlarm('¡Tiempo Terminado!', `El ciclo de ${pLabels[pomoState.mode]} ha finalizado.`);
     const nxt=pomoState.mode==='work'?(pomoState.completed%4===0?'long':'short'):'work'; setPomoMode(nxt);
 }
